@@ -46,14 +46,59 @@ int main() {
     int loggedInUserType = -1; // 1 for manager, 2 for employee, 3 customer , 4 customer without profile
 
     //manager attributes 
+    string managerPWD, managerUsername;
+    managerUsername = "Admin"; //admin username
+    managerPWD = "admin123"; //admin password
     int managerChoice = -1;
 
     //employee attributes
+    string empPWD, empUsername;
+    empUsername = "Emp";
+    empPWD = "emp123";
     int employeeChoice = -1;
+    string notification;
+    const int EmpSize = 10; //max no. of employes size
+    string empName[EmpSize]; //employee full name
+    string empFname[EmpSize]; //emp father name
+    string empCellNo[EmpSize]; //emp cell number
+    string empAddress[EmpSize]; //emp address
+    string empCnic[EmpSize]; //emp cnic number
+    string empDOB[EmpSize]; //emp date of birth
+    char empGender[EmpSize]; //emp gender
 
     //customer attributes
     int customerChoice = -1;
     bool havingCusProfile = false; //cheacks is customer have account or not
+    const int CusSize = 20; //max no. of customers size
+    string cusName[CusSize]; //customer full name
+    string cusCell[CusSize]; //customer cell number
+    string cusAddress[CusSize]; //customer address
+    string cusDOB[CusSize]; //customer birthday
+    string cusGender[CusSize]; //customer gender
+
+    //inventry attributes
+    const int MaxItem = 30; //max no. of items
+    string itemCatagory[MaxItem];
+    string itemSpecs[MaxItem];
+    string itemSupName[MaxItem];
+    string itemColor[MaxItem];
+    int itemQty[MaxItem];
+    double purchasePrice[MaxItem];
+    double salePrice[MaxItem];
+    int minStockLevel[MaxItem];
+    double discount[MaxItem];
+    string status[MaxItem];
+    //mobiles
+    string itemBrand[MaxItem];
+    string itemModel[MaxItem];
+    string itemStorage[MaxItem];
+    //Accessories
+    string itemName[MaxItem];
+
+    //order management attributes
+    string orderStatus[CusSize]; //for order status e.g shipped , pending
+
+
 
     do {
         mainInterface();
@@ -63,16 +108,16 @@ int main() {
         switch (choice) {
             case 1: {
                 managerLoginHeader();
-                setTextColor(14);
+                setTextColor(14); //yellow
                 cout << " Enter Username: ";
-                setTextColor(11);
+                setTextColor(11); //aqua
                 cin >> username;
                 cin.ignore(100, '\n');
                 setTextColor(14);
                 cout << " Enter Password: ";
                 setTextColor(11);
                 pwd = maskedInputPass(); //calls the function to take input and save in pwd
-                if (username == "Admin" && pwd == "admin123")
+                if (username == managerUsername && pwd == managerPWD)
                     loggedInUserType = 1;
                 else {
                     loggedInUserType = -1;
@@ -407,17 +452,17 @@ int main() {
                         break;
                     }
                     case 2:{
-                        customerPortalHeader();
-                        cout << "Please create a profile to access this feature." << endl;
-                        cin.ignore();
-                        cin.get();
+                        setTextColor(12); //red color
+                        cout << "\nPlease create a profile to access this feature." << endl<<endl;
+                        setTextColor(8); //grey color
+                        system("pause");
                         break;
                     }
                     case 3:{
-                        customerPortalHeader();
-                        cout << "Please create a profile to access this feature." << endl;
-                        cin.ignore();
-                        cin.get();
+                        setTextColor(12); //red color
+                        cout << "\nPlease create a profile to access this feature." << endl<<endl;
+                        setTextColor(8); //grey color
+                        system("pause");
                         break;
                     }
                     case 0:{
