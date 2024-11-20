@@ -1,6 +1,7 @@
 #include <iostream>
 #include <windows.h> 
 #include<string>
+#include<iomanip>
 #include <conio.h> //used to use _getch() in masked pass
 using namespace std;
 
@@ -11,9 +12,13 @@ void mainInterface(); //enables to select type of user
 //Shows interfaces
 void managerLoginHeader(); //manager login page
 void managerMainMenu(); //manager portal options
+void inventryManagementHeader(); //shows inventry management header
 void managerInventryManagement(); //shows features of manager inventry
+void employeeManagementHeader(); //show only header
 void managerEmployeeManagement(); //manager user management windows like add,edit,delete 
+void customerManagementHeader(); //shows customer managment header
 void managerCustomerManagement(); // customer managment options
+void orderManagementHeader(); //shows order Management Header
 void managerOrderManagement(); // order of customer management
 
 //2. Employee Portal
@@ -37,27 +42,58 @@ int getValidDigitInput(); //make sure input is 0 - 9 single digit
 string maskedInputPass(); //input masked password from user
 void setTextColor(int color); //changes the color of specific text
 
+//<------------------employee management-------------------------->
+//add employee
+void addEmployee(string empUsername[],string empPwd[],string empName[], string empFname[], string empCellNo[],string empAddress[], string empCnic[], string empDOB[], char empGender[],bool isEmpExist[], int EmpSize,int &empCount);
+//update employee
+void updateEmployee(string empUsername[],string empPwd[],string empName[], string empFname[], string empCellNo[],string empAddress[], string empCnic[], string empDOB[], char empGender[],bool isEmpExist[], int EmpSize,int &empCount); //Uemp : 
+//view all employees
+void viewEmployee(string empUsername[],string empPwd[],string empName[], string empFname[], string empCellNo[],string empAddress[], string empCnic[], string empDOB[], char empGender[],bool isEmpExist[], int EmpSize,int &empCount);
+//delete employee
+void deleteEmployee(string empUsername[],string empPwd[],string empName[], string empFname[], string empCellNo[],string empAddress[], string empCnic[], string empDOB[], char empGender[],bool isEmpExist[], int EmpSize,int &empCount);
 
+//<----------------------inventry management------------------->
+// add inventry
+void addInventry(string mobileBrand[],string mobileModel[],string mobileSpecs[],string mobileSupplierName[],string mobileColor[],   int mobileQty[],string mobileStorage[],double mobPurchasePrice[],double mobSalePrice[],int mobMinStockLevel[],double discount[],string status[],bool isMobileExist[],int MaxMobile,int &inventryChoice, //accessories
+string accessoryName[],string accessorySpecs[],string accessorySupplier[],int accessoryQuantity[],double accessoryPurchasePrice[],double accessorySalePrice[],int accessoryMinStock[],double accessoryDiscount[],string accessoryStatus[],bool isAccessoryExist[],int MaxAccessory);
+//add mobiles
+void addMobiles(string mobileBrand[],string mobileModel[],string mobileSpecs[],string mobileSupplierName[],string mobileColor[],   int mobileQty[],string mobileStorage[],double mobPurchasePrice[],double mobSalePrice[],int mobMinStockLevel[],double discount[],string status[],bool isMobileExist[],int MaxMobile);
+void addAccessories( string accessoryName[],string accessorySpecs[],string accessorySupplier[],int accessoryQuantity[],double accessoryPurchasePrice[],double accessorySalePrice[],int accessoryMinStock[],double accessoryDiscount[],string accessoryStatus[],bool isAccessoryExist[],int MaxAccessory);
+    // accessoryName,
+    // accessorySpecs,
+    // accessorySupplier,
+    // accessoryQuantity,
+    // accessoryPurchasePrice,
+    // accessorySalePrice,
+    // accessoryMinStock,
+    // accessoryDiscount,
+    // accessoryStatus,
+    // isAccessoryExist,
 
 int main() {
-    //for authenticatiom
+    //<--------------for authentication--------------->
     int choice;
     string username, pwd;
     int loggedInUserType = -1; // 1 for manager, 2 for employee, 3 customer , 4 customer without profile
 
-    //manager attributes 
+    //<------------manager attributes---------------> 
     string managerPWD, managerUsername;
     managerUsername = "Admin"; //admin username
     managerPWD = "admin123"; //admin password
     int managerChoice = -1;
 
-    //employee attributes
-    string empPWD, empUsername;
-    empUsername = "Emp";
-    empPWD = "emp123";
+    //<------------employee attributes------------------->
+    // string empPWD, empUsername;
+    // empUsername = "Emp";
+    // empPWD = "emp123";
     int employeeChoice = -1;
     string notification;
     const int EmpSize = 10; //max no. of employes size
+    int empCount = 0; //counts no of employee added
+    string empUsername[EmpSize];
+    string empPwd[EmpSize];
+    bool isUserFound = false; //used in searching
+    bool isEmpExist[EmpSize]; //check the variable is there exist any employee
     string empName[EmpSize]; //employee full name
     string empFname[EmpSize]; //emp father name
     string empCellNo[EmpSize]; //emp cell number
@@ -65,8 +101,20 @@ int main() {
     string empCnic[EmpSize]; //emp cnic number
     string empDOB[EmpSize]; //emp date of birth
     char empGender[EmpSize]; //emp gender
-
-    //customer attributes
+    //initilize arrays
+    for(int i=0; i<EmpSize; i++){
+        empName[i] = "nv";
+        empFname[i] = "nv";
+        empCellNo[i] = "nv";
+        empAddress[i] = "nv";
+        empCnic[i] = "nv";
+        empDOB[i] = "nv";
+        empGender[i] = 'u';
+        isEmpExist[i] = false;
+        empUsername[i] = "nv";
+        empPwd[i] = "nv";
+    }
+    //<-------------------customer attributes---------------------->
     int customerChoice = -1;
     bool havingCusProfile = false; //cheacks is customer have account or not
     const int CusSize = 20; //max no. of customers size
@@ -76,25 +124,37 @@ int main() {
     string cusDOB[CusSize]; //customer birthday
     string cusGender[CusSize]; //customer gender
 
-    //inventry attributes
-    const int MaxItem = 30; //max no. of items
-    string itemCatagory[MaxItem];
-    string itemSpecs[MaxItem];
-    string itemSupName[MaxItem];
-    string itemColor[MaxItem];
-    int itemQty[MaxItem];
-    double purchasePrice[MaxItem];
-    double salePrice[MaxItem];
-    int minStockLevel[MaxItem];
-    double discount[MaxItem];
-    string status[MaxItem];
+    //<------------------inventry attributes------------------>
+    int inventryChoice = -1;
+    int mobileCount = 0;
+    int accessoryCount = 0;
     //mobiles
-    string itemBrand[MaxItem];
-    string itemModel[MaxItem];
-    string itemStorage[MaxItem];
+    const int MaxMobile = 30; //max no. of items
+    string mobileBrand[MaxMobile];
+    string mobileModel[MaxMobile];
+    string mobileSpecs[MaxMobile];
+    string mobileSupplierName[MaxMobile];
+    string mobileColor[MaxMobile];
+    int mobileQty[MaxMobile];
+    string mobileStorage[MaxMobile];
+    double mobPurchasePrice[MaxMobile];
+    double mobSalePrice[MaxMobile];
+    int mobMinStockLevel[MaxMobile];
+    double discount[MaxMobile];
+    string status[MaxMobile];
+    bool isMobileExist[MaxMobile]; //check the variable is there exist any mobile
     //Accessories
-    string itemName[MaxItem];
-
+    const int MaxAccessory = 30; // Maximum number of accessories
+    string accessoryName[MaxAccessory];
+    string accessorySpecs[MaxAccessory];
+    string accessorySupplier[MaxAccessory];
+    int accessoryQuantity[MaxAccessory];
+    double accessoryPurchasePrice[MaxAccessory];
+    double accessorySalePrice[MaxAccessory];
+    int accessoryMinStock[MaxAccessory];
+    double accessoryDiscount[MaxAccessory];
+    string accessoryStatus[MaxAccessory];
+    bool isAccessoryExist[MaxAccessory]; //check the variable is there exist any accessory
     //order management attributes
     string orderStatus[CusSize]; //for order status e.g shipped , pending
 
@@ -117,7 +177,8 @@ int main() {
                 cout << " Enter Password: ";
                 setTextColor(11);
                 pwd = maskedInputPass(); //calls the function to take input and save in pwd
-                if (username == managerUsername && pwd == managerPWD)
+                // if (username == managerUsername && pwd == managerPWD)
+                if (true) //delete this line after u done testing
                     loggedInUserType = 1;
                 else {
                     loggedInUserType = -1;
@@ -137,14 +198,20 @@ int main() {
                 setTextColor(14);
                 cout << " Enter Password: ";
                 setTextColor(11);
+                isUserFound = false;
                 pwd = maskedInputPass(); //calls the function to take input and save in pwd
-                if (username == "Emp" && pwd == "emp123")
-                    loggedInUserType = 2;
-                else {
+                for(int i=0; i<EmpSize; i++){
+                    if (username == empUsername[i] && pwd == empPwd[i]){
+                        loggedInUserType = 2;
+                        isUserFound = true;
+                        break;
+                    }
+                }
+                if (!isUserFound){  //if no user found
                     loggedInUserType = -1;
-                setTextColor(12);
+                    setTextColor(12);
                     cout << "Invalid Employee Credentials!\n";
-                setTextColor(8);
+                    setTextColor(8);
                     system("pause");
                 }
                 break;
@@ -199,8 +266,9 @@ int main() {
                             managerInventryManagement(); //shows inventry management menu
                             managerChoice = getValidDigitInput(); //gets valid input 
                             switch (managerChoice){
-                                case 1:{
-                                    /* code */
+                                case 1:{ //add inventry
+                                    addInventry(mobileBrand,mobileModel,mobileSpecs,mobileSupplierName,mobileColor,mobileQty,mobileStorage,mobPurchasePrice,mobSalePrice, mobMinStockLevel,discount,status,isMobileExist,MaxMobile,inventryChoice,
+                                    accessoryName,accessorySpecs,accessorySupplier,accessoryQuantity,accessoryPurchasePrice,accessorySalePrice,accessoryMinStock,accessoryDiscount,accessoryStatus,isAccessoryExist, MaxAccessory);
                                     break;
                                 }
                                 case 2:{
@@ -236,20 +304,21 @@ int main() {
                             managerEmployeeManagement(); //shows employee management menu
                             managerChoice = getValidDigitInput(); //assures valid input digit 0-9
                             switch (managerChoice){
-                                case 1:{
-                                    /* code */
+                                case 1:{ //add employee
+                                    addEmployee(empUsername,empPwd,empName, empFname, empCellNo, empAddress, empCnic, empDOB, empGender,isEmpExist,EmpSize,empCount);
+
                                     break;
                                 }
-                                case 2:{
-                                    /* code */
+                                case 2:{ //update employee
+                                    updateEmployee(empUsername,empPwd,empName, empFname, empCellNo, empAddress, empCnic, empDOB, empGender,isEmpExist,EmpSize,empCount);
                                     break;
                                 }
-                                case 3:{
-                                    /* code */
+                                case 3:{ //delete employee
+                                    deleteEmployee(empUsername,empPwd,empName, empFname, empCellNo, empAddress, empCnic, empDOB, empGender,isEmpExist,EmpSize,empCount);
                                     break;
                                 }
-                                case 4:{
-                                    /* code */
+                                case 4:{ //view all employees
+                                    viewEmployee(empUsername,empPwd,empName, empFname, empCellNo, empAddress, empCnic, empDOB, empGender,isEmpExist,EmpSize,empCount);
                                     break;
                                 }
                                 case 0:{
@@ -539,6 +608,228 @@ string maskedInputPass(){
     return inputPass;
 }
 
+//<-------------------------------Manager functionalities------------------------------->
+//employee adding function
+void addEmployee(string empUsername[],string empPwd[],string empName[], string empFname[], string empCellNo[],string empAddress[], string empCnic[], string empDOB[], char empGender[], bool isEmpExist[], int EmpSize,int &empCount){
+    system("cls");
+    setTextColor(14); cout << " ===================================" << endl;
+    setTextColor(11); cout << "        --- Add a Employee ---      " << endl;
+    setTextColor(14); cout << " ===================================" << endl;
+
+    int day,month,year;
+    if(empCount<EmpSize){
+        for(int i=0; i<EmpSize; i++){
+            if(!isEmpExist[i]){
+                cout<<"Enter Username : ";
+                getline(cin,empUsername[i]);
+                cout<<"Enter Password : ";
+                getline(cin,empPwd[i]);
+                cout<<"Enter employee full name : ";
+                getline(cin,empName[i]);
+                cout<<"Enter employee father's name : ";
+                getline(cin,empFname[i]);
+                cout<<"Enter employee phone number : ";
+                getline(cin,empCellNo[i]);
+                cout<<"Enter employee cnic number : ";
+                getline(cin,empCnic[i]);
+                cout<<"Enter employee address : ";
+                getline(cin,empAddress[i]);
+                cout<<"Enter employee date of birth (DD-MM-YYYY): ";
+                getline(cin,empDOB[i]);
+                cout<<"Enter gender (M for male or F for Female): ";
+                cin>>empGender[i];
+                empCount++;
+                isEmpExist[i] = true;
+                setTextColor(10); //green
+                cout << "\n\t\t\t\t\t\t\t\tEmployee added successfully......."<<endl;
+                cin.ignore();
+                cin.get();
+                break;
+            }
+        }
+    }
+    else{
+        setTextColor(12); //red
+        cout<<"\n\tMaximum number of employees reached. Cannot add more employees!"<<endl;
+        cin.get();
+    }
+}
+//Uemp : 
+void updateEmployee(string empUsername[],string empPwd[],string empName[], string empFname[], string empCellNo[],string empAddress[], string empCnic[], string empDOB[], char empGender[],bool isEmpExist[], int EmpSize,int &empCount){
+    string username; //for searching by username 
+    bool isUserFound = false; //checks if user found & data updated
+    system("cls");
+    setTextColor(14); cout << " ===================================" << endl;
+    setTextColor(11); cout << "     --- Update Employee Data ---   " << endl;
+    setTextColor(14); cout << " ===================================" << endl;
+    if(empCount!=0){
+        cout<<" Enter username of employee : ";
+        cin>>username;
+        for(int i=0; i<EmpSize; i++){
+            if(username == empUsername[i]){
+                cout<<"Enter updated Username : ";
+                cin.ignore();
+                getline(cin,empUsername[i]);
+                cout<<"Enter new Password : ";
+                getline(cin,empPwd[i]);
+                cout<<"Enter employee full name : ";
+                getline(cin,empName[i]);
+                cout<<"Enter employee father's name : ";
+                getline(cin,empFname[i]);
+                cout<<"Enter employee phone number : ";
+                getline(cin,empCellNo[i]);
+                cout<<"Enter employee cnic number : ";
+                getline(cin,empCnic[i]);
+                cout<<"Enter employee address : ";
+                getline(cin,empAddress[i]);
+                cout<<"Enter employee date of birth (DD-MM-YYYY): ";
+                getline(cin,empDOB[i]);
+                cout<<"Enter gender (M for male or F for Female): ";
+                cin>>empGender[i];
+                isUserFound = true;
+                setTextColor(10); //green
+                cout << "\n\t\t\t\t\t\t\t\tEmployee data updated successfully......."<<endl;
+                cin.get();
+                break;
+            }
+        }
+        if(!isUserFound){
+            setTextColor(12); // Red 
+            cout<<"\n  No user found!";
+            cin.get();
+        }
+    }
+    else{
+        setTextColor(12); // Red 
+        cout << "\nNo employee added yet!"<<endl;
+    }
+    cin.get();
+}
+void deleteEmployee(string empUsername[],string empPwd[],string empName[], string empFname[], string empCellNo[],string empAddress[], string empCnic[], string empDOB[], char empGender[],bool isEmpExist[], int EmpSize,int &empCount){
+    string username; //for searching by username 
+    bool isUserFound = false; //checks if user found & data deleted
+    system("cls");
+    setTextColor(14); cout << " ===================================" << endl;
+    setTextColor(11); cout << "     --- Delete Employee Data ---   " << endl;
+    setTextColor(14); cout << " ===================================" << endl;
+    if(empCount!=0){
+        cout<<" Enter username of employee : ";
+        cin>>username;
+        for(int i=0; i<EmpSize; i++){
+            if(username == empUsername[i]){
+                empName[i] = "nv";
+                empFname[i] = "nv";
+                empCellNo[i] = "nv";
+                empAddress[i] = "nv";
+                empCnic[i] = "nv";
+                empDOB[i] = "nv";
+                empGender[i] = 'u';
+                isEmpExist[i] = false;
+                empUsername[i] = "nv";
+                empPwd[i] = "nv";
+                empCount--;
+                isEmpExist[i] = false;
+                isUserFound = true;
+                setTextColor(10); //green
+                cout << "\n\t\t\t\t\t\t\t\tEmployee data deleted successfully......."<<endl;
+                cin.get();
+                break;
+            }
+        }
+        if(!isUserFound){
+            setTextColor(12); // Red 
+            cout<<"\n No user found!";
+            cin.get();
+        }
+    }
+    else{
+        setTextColor(12); // Red 
+        cout << "\nNo employee added yet!"<<endl;
+    }
+    cin.get();    
+}
+
+
+//view employees
+void viewEmployee(string empUsername[],string empPwd[],string empName[], string empFname[], string empCellNo[],string empAddress[], string empCnic[], string empDOB[], char empGender[],bool isEmpExist[], int EmpSize,int &empCount){
+    system("cls");
+    cout<<endl<<endl;
+    setTextColor(14); cout << "\t\t\t\t\t\t\t\t===================================" << endl;
+    setTextColor(11); cout << "\t\t\t\t\t\t\t\t     --- View all Employees ---    " << endl;
+    setTextColor(14); cout << "\t\t\t\t\t\t\t\t===================================" << endl<<endl;
+    cout<<left;
+    cout<<" -----------------------------------------------------------------------------------------------------------------------------------------------------------------------" << endl;
+    cout<<setw(7)<<" | No. "<<setw(13)<<"| Username"<<setw(13)<<"| Password"<<setw(16)<<"| Full Name"<<setw(16)<<"| Father Name"<<setw(15)<<"| Cell No"<<setw(19)<<"| CNIC"<<setw(15)<<"| DOB"<<setw(9)<<"| Gender"<<setw(44)<<"| Address"<<"|"<<endl;
+    cout<<" -----------------------------------------------------------------------------------------------------------------------------------------------------------------------" << endl;
+    if(empCount!=0){
+        for(int i=0; i<EmpSize; i++){
+            if(isEmpExist[i]){
+                cout << " | " << setw(4) << i + 1 << "| "
+                     << setw(11) << empUsername[i] << "| "
+                     << setw(11) << empPwd[i] << "| "
+                     << setw(14) << empName[i] << "| "
+                     << setw(14) << empFname[i] << "| "
+                     << setw(13) << empCellNo[i] << "| "
+                     << setw(17) << empCnic[i] << "| "
+                     << setw(13) << empDOB[i] << "| "
+                     << setw(7) << empGender[i] << "| "
+                     << setw(42) << empAddress[i] << "| " << endl;
+            }
+        }
+        cout<<" -----------------------------------------------------------------------------------------------------------------------------------------------------------------------" << endl;
+        
+    }
+    else{
+        setTextColor(12); // Red 
+        cout << "\n\tNo employee added yet!"<<endl;
+    }
+    cin.get();
+
+}
+
+//<-------------------------------inventry management---------------------------------->
+//add mobiles
+void addMobiles(string mobileBrand[],string mobileModel[],string mobileSpecs[],string mobileSupplierName[],string mobileColor[],   int mobileQty[],string mobileStorage[],double mobPurchasePrice[],double mobSalePrice[],int mobMinStockLevel[],double discount[],string status[],bool isMobileExist[],int MaxMobile){
+
+}
+//add accessories
+void addAccessories( string accessoryName[],string accessorySpecs[],string accessorySupplier[],int accessoryQuantity[],double accessoryPurchasePrice[],double accessorySalePrice[],int accessoryMinStock[],double accessoryDiscount[],string accessoryStatus[],bool isAccessoryExist[],int MaxAccessory){
+
+}
+
+void addInventry(string mobileBrand[],string mobileModel[],string mobileSpecs[],string mobileSupplierName[],string mobileColor[],   int mobileQty[],string mobileStorage[],double mobPurchasePrice[],double mobSalePrice[],int mobMinStockLevel[],double discount[],string status[],bool isMobileExist[],int MaxMobile,int &inventryChoice, //accessories
+string accessoryName[],string accessorySpecs[],string accessorySupplier[],int accessoryQuantity[],double accessoryPurchasePrice[],double accessorySalePrice[],int accessoryMinStock[],double accessoryDiscount[],string accessoryStatus[],bool isAccessoryExist[],int MaxAccessory
+){
+    system("cls");
+    setTextColor(14); cout << " ===================================" << endl;
+    setTextColor(11); cout << "        --- Add Inventory ---       " << endl;
+    setTextColor(14); cout << " ===================================" << endl<<endl;
+    setTextColor(14); cout << " 1. "; setTextColor(11); cout << "Add Mobile" << endl;
+    setTextColor(14); cout << " 2. "; setTextColor(11); cout << "Add Accessory" << endl;
+    setTextColor(14); cout << " 0. "; setTextColor(11); cout << "Exit" << endl;
+    setTextColor(14); cout << " ===================================" << endl;
+    do {
+        inventryChoice = getValidDigitInput(); //assures valid input digit 0-9
+        switch (inventryChoice) {
+            case 1:{ //add mobile
+                addMobiles(mobileBrand,mobileModel,mobileSpecs,mobileSupplierName,mobileColor,mobileQty,mobileStorage,mobPurchasePrice,mobSalePrice, mobMinStockLevel,discount,status,isMobileExist,MaxMobile);
+                break;
+            }  
+            case 2:{ //add accessory
+                addAccessories(accessoryName,accessorySpecs,accessorySupplier,accessoryQuantity,accessoryPurchasePrice,accessorySalePrice,accessoryMinStock,accessoryDiscount,accessoryStatus,isAccessoryExist, MaxAccessory);
+                break;
+            }
+            case 0:{
+                break;
+            }
+            default:{
+                invalidErrorMessage();
+            }
+        }
+    } while (inventryChoice!= 0);
+    inventryChoice = -1;
+
+}
 //<-------------------------------interfaces functions---------------------------------->
 void mainInterface() {
     system("cls"); // clears the screen
@@ -605,12 +896,14 @@ void managerMainMenu() {
 }
 
 // Manager Inventory Management Interface
-void managerInventryManagement() {
+void inventryManagementHeader(){
     system("cls");
     setTextColor(14); cout << " ===================================" << endl;
     setTextColor(11); cout << "     --- Inventory Management ---   " << endl;
     setTextColor(14); cout << " ===================================" << endl;
-
+}
+void managerInventryManagement() {
+    inventryManagementHeader();
     setTextColor(14); cout << " 1. "; setTextColor(11); cout << "Add Products" << endl;
     setTextColor(14); cout << " 2. "; setTextColor(11); cout << "Update Products" << endl;
     setTextColor(14); cout << " 3. "; setTextColor(11); cout << "Delete Products" << endl;
@@ -622,12 +915,15 @@ void managerInventryManagement() {
 }
 
 // Manager Employee Management Interface
-void managerEmployeeManagement() {
+
+void employeeManagementHeader(){
     system("cls");
     setTextColor(14); cout << " ====================================" << endl;
     setTextColor(11); cout << "     --- Employee Management ---     " << endl;
     setTextColor(14); cout << " ====================================" << endl;
-
+}
+void managerEmployeeManagement() {
+    employeeManagementHeader();
     setTextColor(14); cout << " 1. "; setTextColor(11); cout << "Add Employee" << endl;
     setTextColor(14); cout << " 2. "; setTextColor(11); cout << "Update Employee Data" << endl;
     setTextColor(14); cout << " 3. "; setTextColor(11); cout << "Delete Employee" << endl;
@@ -638,12 +934,14 @@ void managerEmployeeManagement() {
 }
 
 // Manager Customer Management Interface
-void managerCustomerManagement() {
+void customerManagementHeader(){
     system("cls");
     setTextColor(14); cout << " ====================================" << endl;
     setTextColor(11); cout << "     --- Customer Management ---     " << endl;
     setTextColor(14); cout << " ====================================" << endl;
-
+}
+void managerCustomerManagement() {
+    customerManagementHeader();
     setTextColor(14); cout << " 1. "; setTextColor(11); cout << "View All Customers" << endl;
     setTextColor(14); cout << " 2. "; setTextColor(11); cout << "Delete Customer Account" << endl;
     setTextColor(14); cout << " 3. "; setTextColor(11); cout << "View Purchase History" << endl;
@@ -653,12 +951,14 @@ void managerCustomerManagement() {
 }
 
 // Manager Order Management Interface
-void managerOrderManagement() {
+void orderManagementHeader(){
     system("cls");
     setTextColor(14); cout << " ====================================" << endl;
     setTextColor(11); cout << "       --- Order Management ---      " << endl;
     setTextColor(14); cout << " ====================================" << endl;
-
+}
+void managerOrderManagement() {
+    orderManagementHeader();
     setTextColor(14); cout << " 1. "; setTextColor(11); cout << "View All Orders" << endl;
     setTextColor(14); cout << " 2. "; setTextColor(11); cout << "Update Order Status" << endl;
     setTextColor(14); cout << " 3. "; setTextColor(11); cout << "Cancel Orders" << endl;
@@ -692,11 +992,7 @@ void employeeMainMenu() {
     setTextColor(14); cout << " ===================================" << endl;
 }
 void employeeInventryManagement() {
-    system("cls");
-    setTextColor(14); cout << " ===================================" << endl;
-    setTextColor(11); cout << "     --- Inventory Management ---   " << endl;
-    setTextColor(14); cout << " ===================================" << endl;
-
+    inventryManagementHeader();
     setTextColor(14); cout << " 1. "; setTextColor(11); cout << "Add Products" << endl;
     setTextColor(14); cout << " 2. "; setTextColor(11); cout << "Update Products" << endl;
     setTextColor(14); cout << " 3. "; setTextColor(11); cout << "View All Products" << endl;
@@ -707,11 +1003,7 @@ void employeeInventryManagement() {
 }
 
 void employeeCustomerManagement() {
-    system("cls");
-    setTextColor(14); cout << " ====================================" << endl;
-    setTextColor(11); cout << "     --- Customer Management ---     " << endl;
-    setTextColor(14); cout << " ====================================" << endl;
-
+    customerManagementHeader();
     setTextColor(14); cout << " 1. "; setTextColor(11); cout << "View All Customers" << endl;
     setTextColor(14); cout << " 2. "; setTextColor(11); cout << "View Purchase History" << endl;
     setTextColor(14); cout << " 0. "; setTextColor(11); cout << "Exit" << endl;
@@ -720,11 +1012,7 @@ void employeeCustomerManagement() {
 }
 
 void employeeOrderManagement() {
-    system("cls");
-    setTextColor(14); cout << " ====================================" << endl;
-    setTextColor(11); cout << "       --- Order Management ---      " << endl;
-    setTextColor(14); cout << " ====================================" << endl;
-
+    orderManagementHeader();
     setTextColor(14); cout << " 1. "; setTextColor(11); cout << "View All Orders" << endl;
     setTextColor(14); cout << " 2. "; setTextColor(11); cout << "Update Order Status" << endl;
     setTextColor(14); cout << " 3. "; setTextColor(11); cout << "Cancel Orders" << endl;
