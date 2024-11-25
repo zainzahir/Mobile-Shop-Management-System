@@ -31,14 +31,17 @@ void employeeOrderManagement(); // order of customer management under employee
 
 //3. customer portal
 //Shows interfaces
+void customerLoginHeader();
 void customerPortalHeader();
 void customerPortal(); //customer portal with options
 void customerProfileMenu(); //customer within profile options
 void customerWithoutLoginMenu(); ////customer without having a profile
 
 //other functionalities 
+//<---------------validations----------------------->
 void invalidErrorMessage(); //invalid option error
 int getValidDigitInput(); //make sure input is 0 - 9 single digit
+string correctDataEntry(); //ensures user enter b/w (A to Z) & 0 - 9
 string maskedInputPass(); //input masked password from user
 void setTextColor(int color); //changes the color of specific text
 
@@ -54,21 +57,19 @@ void deleteEmployee(string empUsername[],string empPwd[],string empName[], strin
 
 //<----------------------inventry management------------------->
 // add inventry
-void addInventry(string mobileBrand[],string mobileModel[],string mobileSpecs[],string mobileSupplierName[],string mobileColor[],   int mobileQty[],string mobileStorage[],double mobPurchasePrice[],double mobSalePrice[],int mobMinStockLevel[],double discount[],string status[],bool isMobileExist[],int MaxMobile,int &inventryChoice, //accessories
-string accessoryName[],string accessorySpecs[],string accessorySupplier[],int accessoryQuantity[],double accessoryPurchasePrice[],double accessorySalePrice[],int accessoryMinStock[],double accessoryDiscount[],string accessoryStatus[],bool isAccessoryExist[],int MaxAccessory);
+void addInventry(string mobileBrand[],string mobileModel[],string mobileSpecs[],string mobileSupplierName[],string mobileColor[],   int mobileQty[],string mobileStorage[],double mobPurchasePrice[],double mobSalePrice[],int mobMinStockLevel[],double discount[],string status[],bool isMobileExist[],int MaxMobile,int &inventryChoice,int mobItemId[],int &mobileCount, //accessories
+string accessoryName[],string accessorySpecs[],string accessorySupplier[],int accessoryQuantity[],double accessoryPurchasePrice[],double accessorySalePrice[],int accessoryMinStock[],double accessoryDiscount[],string accessoryStatus[],bool isAccessoryExist[],int MaxAccessory,int &accessoryCount);
 //add mobiles
-void addMobiles(string mobileBrand[],string mobileModel[],string mobileSpecs[],string mobileSupplierName[],string mobileColor[],   int mobileQty[],string mobileStorage[],double mobPurchasePrice[],double mobSalePrice[],int mobMinStockLevel[],double discount[],string status[],bool isMobileExist[],int MaxMobile);
-void addAccessories( string accessoryName[],string accessorySpecs[],string accessorySupplier[],int accessoryQuantity[],double accessoryPurchasePrice[],double accessorySalePrice[],int accessoryMinStock[],double accessoryDiscount[],string accessoryStatus[],bool isAccessoryExist[],int MaxAccessory);
-    // accessoryName,
-    // accessorySpecs,
-    // accessorySupplier,
-    // accessoryQuantity,
-    // accessoryPurchasePrice,
-    // accessorySalePrice,
-    // accessoryMinStock,
-    // accessoryDiscount,
-    // accessoryStatus,
-    // isAccessoryExist,
+void addMobiles(string mobileBrand[],string mobileModel[],string mobileSpecs[],string mobileSupplierName[],string mobileColor[],   int mobileQty[],string mobileStorage[],double mobPurchasePrice[],double mobSalePrice[],int mobMinStockLevel[],double discount[],string status[],bool isMobileExist[],int MaxMobile,int mobItemId[],int &mobileCount);
+void addAccessories( string accessoryName[],string accessorySpecs[],string accessorySupplier[],int accessoryQuantity[],double accessoryPurchasePrice[],double accessorySalePrice[],int accessoryMinStock[],double accessoryDiscount[],string accessoryStatus[],bool isAccessoryExist[],int MaxAccessory,int &accessoryCount);
+void updateMobiles(string mobileBrand[],string mobileModel[],string mobileSpecs[],string mobileSupplierName[],string mobileColor[],   int mobileQty[],string mobileStorage[],double mobPurchasePrice[],double mobSalePrice[],int mobMinStockLevel[],double discount[],string status[],bool isMobileExist[],int MaxMobile,int mobItemId[],int &mobileCount);
+void deleteMobiles(string mobileBrand[],string mobileModel[],string mobileSpecs[],string mobileSupplierName[],string mobileColor[],   int mobileQty[],string mobileStorage[],double mobPurchasePrice[],double mobSalePrice[],int mobMinStockLevel[],double discount[],string status[],bool isMobileExist[],int MaxMobile,int mobItemId[],int &mobileCount);
+void viewMobiles(string mobileBrand[],string mobileModel[],string mobileSpecs[],string mobileSupplierName[],string mobileColor[],   int mobileQty[],string mobileStorage[],double mobPurchasePrice[],double mobSalePrice[],int mobMinStockLevel[],double discount[],string status[],bool isMobileExist[],int MaxMobile,int mobItemId[],int &mobileCount,bool isAdmin); //here bool isAdmin determine wether to show full detailed list or ristricted (1 for admin, 0 for others)
+//<------------------Customer profiles-------------------------->
+void addCustomer(string cusUsername[],string cusPwd[],string cusName[],string cusCell[],string cusAddress[],string cusDOB[],string cusGender[],bool isCustomerExit[],int CusSize,int &customerCount);
+void viewAllCustomer(string cusUsername[],string cusPwd[],string cusName[],string cusCell[],string cusAddress[],string cusDOB[],string cusGender[],bool isCustomerExit[],int CusSize,int &customerCount);
+void deleteCustomer(string cusUsername[],string cusPwd[],string cusName[],string cusCell[],string cusAddress[],string cusDOB[],string cusGender[],bool isCustomerExit[],int CusSize,int &customerCount);
+void updateCustomer(string cusUsername[],string cusPwd[],string cusName[],string cusCell[],string cusAddress[],string cusDOB[],string cusGender[],bool isCustomerExit[],int CusSize,int &customerCount);
 
 int main() {
     //<--------------for authentication--------------->
@@ -115,21 +116,35 @@ int main() {
         empPwd[i] = "nv";
     }
     //<-------------------customer attributes---------------------->
+    const int CusSize = 100; //max no. of customers size
     int customerChoice = -1;
-    bool havingCusProfile = false; //cheacks is customer have account or not
-    const int CusSize = 20; //max no. of customers size
+    int customerCount = 0; //counts no of customer added
+    string cusUsername[CusSize];
+    string cusPwd[CusSize];
+    bool isCustomerExit[CusSize]; //cheacks is customer have account or not
     string cusName[CusSize]; //customer full name
     string cusCell[CusSize]; //customer cell number
     string cusAddress[CusSize]; //customer address
     string cusDOB[CusSize]; //customer birthday
     string cusGender[CusSize]; //customer gender
-
+    //initilize arrays
+    for(int i=0; i<CusSize; i++){
+        cusUsername[i] = "nv";
+        cusPwd[i] = "nv";
+        cusName[i] = "nv";
+        cusCell[i] = "nv";
+        cusAddress[i] = "nv";
+        cusDOB[i] = "nv";
+        cusGender[i] = "nv";
+        isCustomerExit[i] = false;
+    }
     //<------------------inventry attributes------------------>
     int inventryChoice = -1;
     int mobileCount = 0;
     int accessoryCount = 0;
     //mobiles
     const int MaxMobile = 30; //max no. of items
+    int mobItemId[MaxMobile];
     string mobileBrand[MaxMobile];
     string mobileModel[MaxMobile];
     string mobileSpecs[MaxMobile];
@@ -155,10 +170,26 @@ int main() {
     double accessoryDiscount[MaxAccessory];
     string accessoryStatus[MaxAccessory];
     bool isAccessoryExist[MaxAccessory]; //check the variable is there exist any accessory
+    for(int i=0; i<MaxMobile; i++){
+        mobItemId[i] = -1;
+        mobileBrand[i] = "nv";
+        mobileModel[i] = "nv";
+        mobileSpecs[i] = "nv";
+        mobileSupplierName[i] = "nv";
+        mobileColor[i] = "nv";
+        mobileQty[i] = 0;
+        mobileStorage[i] = "nv";
+        mobPurchasePrice[i] = 0;
+        mobSalePrice[i] = 0;
+        mobMinStockLevel[i] = 0;
+        discount[i] = 0;
+        status[i] = "nv";
+        isMobileExist[i] = false;
+    }
     //order management attributes
+    const int MaxOrder = 10; //10 orders per person
     string orderStatus[CusSize]; //for order status e.g shipped , pending
-
-
+    int orders[CusSize][MaxOrder] = {{0}};
 
     do {
         mainInterface();
@@ -222,10 +253,35 @@ int main() {
                     customerPortal();
                     cusPortalChoice = getValidDigitInput();
                     switch(cusPortalChoice){
-                            case 1:{
+                            case 1:{ //create profile
+                                addCustomer(cusUsername,cusPwd,cusName,cusCell,cusAddress,cusDOB,cusGender,isCustomerExit,CusSize,customerCount);
                                 break;
                             }
                             case 2:{
+                                customerLoginHeader();
+                                setTextColor(14);
+                                cout << " Enter Username: ";
+                                setTextColor(11);
+                                cin >> username;
+                                setTextColor(14);
+                                cout << " Enter Password: ";
+                                setTextColor(11);
+                                isUserFound = false;
+                                pwd = maskedInputPass(); //calls the function to take input and save in pwd
+                                for(int i=0; i<CusSize; i++){
+                                    if (username == cusUsername[i] && pwd == cusPwd[i]){
+                                        loggedInUserType = 3;
+                                        isUserFound = true;
+                                        break;
+                                    }
+                                }
+                                if (!isUserFound){  //if no user found
+                                    loggedInUserType = -1;
+                                    setTextColor(12);
+                                    cout << "Invalid Customer Credentials!\n";
+                                    setTextColor(8);
+                                    system("pause");
+                                }
                                 break;
                             }
                             case 3:{
@@ -267,20 +323,23 @@ int main() {
                             managerChoice = getValidDigitInput(); //gets valid input 
                             switch (managerChoice){
                                 case 1:{ //add inventry
-                                    addInventry(mobileBrand,mobileModel,mobileSpecs,mobileSupplierName,mobileColor,mobileQty,mobileStorage,mobPurchasePrice,mobSalePrice, mobMinStockLevel,discount,status,isMobileExist,MaxMobile,inventryChoice,
-                                    accessoryName,accessorySpecs,accessorySupplier,accessoryQuantity,accessoryPurchasePrice,accessorySalePrice,accessoryMinStock,accessoryDiscount,accessoryStatus,isAccessoryExist, MaxAccessory);
+                                    // addInventry(mobileBrand,mobileModel,mobileSpecs,mobileSupplierName,mobileColor,mobileQty,mobileStorage,mobPurchasePrice,mobSalePrice, mobMinStockLevel,discount,status,isMobileExist,MaxMobile,inventryChoice,mobileCount,
+                                    // accessoryName,accessorySpecs,accessorySupplier,accessoryQuantity,accessoryPurchasePrice,accessorySalePrice,accessoryMinStock,accessoryDiscount,accessoryStatus,isAccessoryExist, MaxAccessory,accessoryCount);
+
+                                    addMobiles(mobileBrand,mobileModel,mobileSpecs,mobileSupplierName,mobileColor,mobileQty,mobileStorage,mobPurchasePrice,mobSalePrice, mobMinStockLevel,discount,status,isMobileExist,MaxMobile,mobItemId,mobileCount);
                                     break;
                                 }
-                                case 2:{
-                                    /* code */
+                                case 2:{ //update inventry
+                                    updateMobiles(mobileBrand,mobileModel,mobileSpecs,mobileSupplierName,mobileColor,mobileQty,mobileStorage,mobPurchasePrice,mobSalePrice, mobMinStockLevel,discount,status,isMobileExist,MaxMobile,mobItemId,mobileCount);
+                                    
                                     break;
                                 }
                                 case 3:{
-                                    /* code */
+                                    deleteMobiles(mobileBrand,mobileModel,mobileSpecs,mobileSupplierName,mobileColor,mobileQty,mobileStorage,mobPurchasePrice,mobSalePrice, mobMinStockLevel,discount,status,isMobileExist,MaxMobile,mobItemId,mobileCount);
                                     break;
                                 }
                                 case 4:{
-                                    /* code */
+                                    viewMobiles(mobileBrand,mobileModel,mobileSpecs,mobileSupplierName,mobileColor,mobileQty,mobileStorage,mobPurchasePrice,mobSalePrice, mobMinStockLevel,discount,status,isMobileExist,MaxMobile,mobItemId,mobileCount,1);
                                     break;
                                 }
                                 case 5:{
@@ -337,16 +396,20 @@ int main() {
                         do{
                             managerCustomerManagement(); //shows customer management menu
                             managerChoice = getValidDigitInput(); //assures valid input digit 0-9
-                            switch (managerChoice){
-                                case 1:{
-                                    /* code */
+                            switch (managerChoice){ //view all customers
+                                case 1:{ //view all customers
+                                    viewAllCustomer(cusUsername,cusPwd,cusName,cusCell,cusAddress,cusDOB,cusGender,isCustomerExit,CusSize,customerCount);
                                     break;
                                 }
-                                case 2:{
-                                    /* code */
+                                case 2:{ //update customer data
+                                    updateCustomer(cusUsername,cusPwd,cusName,cusCell,cusAddress,cusDOB,cusGender,isCustomerExit,CusSize,customerCount);
                                     break;
                                 }
-                                case 3:{
+                                case 3:{ //delete customer
+                                    deleteCustomer(cusUsername,cusPwd,cusName,cusCell,cusAddress,cusDOB,cusGender,isCustomerExit,CusSize,customerCount);
+                                    break;
+                                }
+                                case 4:{
                                     /* code */
                                     break;
                                 }
@@ -388,16 +451,19 @@ int main() {
                             employeeInventryManagement(); //Inventry management menu of employee
                             employeeChoice = getValidDigitInput(); //assures valid input digit 0-9
                             switch (employeeChoice){
-                                case 1:{
-                                    /* code */
+                                case 1:{ //add items
+                                    // addInventry(mobileBrand,mobileModel,mobileSpecs,mobileSupplierName,mobileColor,mobileQty,mobileStorage,mobPurchasePrice,mobSalePrice, mobMinStockLevel,discount,status,isMobileExist,MaxMobile,inventryChoice,mobileCount,
+                                    // accessoryName,accessorySpecs,accessorySupplier,accessoryQuantity,accessoryPurchasePrice,accessorySalePrice,accessoryMinStock,accessoryDiscount,accessoryStatus,isAccessoryExist, MaxAccessory,accessoryCount);
+
+                                    addMobiles(mobileBrand,mobileModel,mobileSpecs,mobileSupplierName,mobileColor,mobileQty,mobileStorage,mobPurchasePrice,mobSalePrice, mobMinStockLevel,discount,status,isMobileExist,MaxMobile,mobItemId,mobileCount);
                                     break;
                                 }
-                                case 2:{
-                                    /* code */
+                                case 2:{ //update items
+                                    updateMobiles(mobileBrand,mobileModel,mobileSpecs,mobileSupplierName,mobileColor,mobileQty,mobileStorage,mobPurchasePrice,mobSalePrice, mobMinStockLevel,discount,status,isMobileExist,MaxMobile,mobItemId,mobileCount);
                                     break;
                                 }
-                                case 3:{
-                                    /* code */
+                                case 3:{ //view all items
+                                    viewMobiles(mobileBrand,mobileModel,mobileSpecs,mobileSupplierName,mobileColor,mobileQty,mobileStorage,mobPurchasePrice,mobSalePrice, mobMinStockLevel,discount,status,isMobileExist,MaxMobile,mobItemId,mobileCount,0);
                                     break;
                                 }
                                 case 4:{
@@ -421,8 +487,8 @@ int main() {
                             employeeCustomerManagement(); //shows customer managment menu of Emp
                             employeeChoice = getValidDigitInput(); //assures valid input digit 0-9
                             switch (employeeChoice){
-                                case 1:{
-                                    /* code */
+                                case 1:{ //view all customers
+                                    updateCustomer(cusUsername,cusPwd,cusName,cusCell,cusAddress,cusDOB,cusGender,isCustomerExit,CusSize,customerCount);
                                     break;
                                 }
                                 case 2:{
@@ -487,18 +553,24 @@ int main() {
             employeeChoice = -1; //resets to make sure emp exit
         }
         else if (loggedInUserType == 3) { // Customer portal
+            int customerChoice = -1;
             do{
                 customerProfileMenu();
                 customerChoice = getValidDigitInput(); //assures valid input digit 0-9
                 switch (customerChoice){
-                    case 1:{
-                                break;
+                    case 1:{ //view items
+                        viewMobiles(mobileBrand,mobileModel,mobileSpecs,mobileSupplierName,mobileColor,mobileQty,mobileStorage,mobPurchasePrice,mobSalePrice, mobMinStockLevel,discount,status,isMobileExist,MaxMobile,mobItemId,mobileCount,0);
+                        break;
                     }
                     case 2:{
                     
                         break;
                     }
                     case 3:{
+                        break;
+                    }
+                    case 4:{ //update profile
+                        updateCustomer(cusUsername,cusPwd,cusName,cusCell,cusAddress,cusDOB,cusGender,isCustomerExit,CusSize,customerCount);
                         break;
                     }
                     case 0:{
@@ -514,10 +586,11 @@ int main() {
         else if (loggedInUserType == 4) { // Customer without profile
             int customerChoice;
             do{
-                customerProfileMenu();
+                customerWithoutLoginMenu();
                 customerChoice = getValidDigitInput(); //assures valid input digit 0-9
                 switch (customerChoice){
-                    case 1:{
+                    case 1:{ //view items
+                        viewMobiles(mobileBrand,mobileModel,mobileSpecs,mobileSupplierName,mobileColor,mobileQty,mobileStorage,mobPurchasePrice,mobSalePrice, mobMinStockLevel,discount,status,isMobileExist,MaxMobile,mobItemId,mobileCount,0);
                         break;
                     }
                     case 2:{
@@ -550,7 +623,7 @@ int main() {
     return 0;
 }
 
-//<-------------------------------Functionalities functions---------------------------------->
+//<-------------------------------Functionalities functions & validations---------------------------------->
 //this chacks whether input from 0 to 9
 int getValidDigitInput(){
     int input = -1; //that will return the final correct input
@@ -607,7 +680,27 @@ string maskedInputPass(){
     cout<<endl;
     return inputPass;
 }
-
+string correctDataEntry() {
+    string input;
+    bool correct = false;
+    do {
+        getline(cin, input); //input
+        // Check if input is not empty and contains at least one valid character
+        correct = false;
+        for (int i = 0; i < input.length(); ++i) { //validate here char by char
+            char c = input[i];
+            //check if lies b/w (A to Z)
+            if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z' || (c>= '0' && c<= '9'))) {
+                correct = true;
+                break;
+            }
+        }
+        if (!correct) {
+            cout << "Invalid input! Enter again : ";
+        }
+    } while (!correct);
+    return input;
+}
 //<-------------------------------Manager functionalities------------------------------->
 //employee adding function
 void addEmployee(string empUsername[],string empPwd[],string empName[], string empFname[], string empCellNo[],string empAddress[], string empCnic[], string empDOB[], char empGender[], bool isEmpExist[], int EmpSize,int &empCount){
@@ -616,24 +709,23 @@ void addEmployee(string empUsername[],string empPwd[],string empName[], string e
     setTextColor(11); cout << "        --- Add a Employee ---      " << endl;
     setTextColor(14); cout << " ===================================" << endl;
 
-    int day,month,year;
     if(empCount<EmpSize){
         for(int i=0; i<EmpSize; i++){
             if(!isEmpExist[i]){
                 cout<<"Enter Username : ";
-                getline(cin,empUsername[i]);
+                empUsername[i] = correctDataEntry();
                 cout<<"Enter Password : ";
-                getline(cin,empPwd[i]);
+                empPwd[i] = correctDataEntry();
                 cout<<"Enter employee full name : ";
-                getline(cin,empName[i]);
+                empName[i] = correctDataEntry();
                 cout<<"Enter employee father's name : ";
-                getline(cin,empFname[i]);
+                empFname[i] = correctDataEntry();
                 cout<<"Enter employee phone number : ";
-                getline(cin,empCellNo[i]);
+                empCellNo[i] = correctDataEntry();
                 cout<<"Enter employee cnic number : ";
-                getline(cin,empCnic[i]);
+                empCnic[i] = correctDataEntry();
                 cout<<"Enter employee address : ";
-                getline(cin,empAddress[i]);
+                empAddress[i] = correctDataEntry();
                 cout<<"Enter employee date of birth (DD-MM-YYYY): ";
                 getline(cin,empDOB[i]);
                 cout<<"Enter gender (M for male or F for Female): ";
@@ -669,19 +761,19 @@ void updateEmployee(string empUsername[],string empPwd[],string empName[], strin
             if(username == empUsername[i]){
                 cout<<"Enter updated Username : ";
                 cin.ignore();
-                getline(cin,empUsername[i]);
+                empUsername[i] = correctDataEntry();
                 cout<<"Enter new Password : ";
-                getline(cin,empPwd[i]);
+                empPwd[i] = correctDataEntry();
                 cout<<"Enter employee full name : ";
-                getline(cin,empName[i]);
+                empName[i] = correctDataEntry();
                 cout<<"Enter employee father's name : ";
-                getline(cin,empFname[i]);
+                empFname[i] = correctDataEntry();
                 cout<<"Enter employee phone number : ";
-                getline(cin,empCellNo[i]);
+                empCellNo[i] = correctDataEntry();
                 cout<<"Enter employee cnic number : ";
-                getline(cin,empCnic[i]);
+                empCnic[i] = correctDataEntry();
                 cout<<"Enter employee address : ";
-                getline(cin,empAddress[i]);
+                empAddress[i] = correctDataEntry();
                 cout<<"Enter employee date of birth (DD-MM-YYYY): ";
                 getline(cin,empDOB[i]);
                 cout<<"Enter gender (M for male or F for Female): ";
@@ -789,34 +881,115 @@ void viewEmployee(string empUsername[],string empPwd[],string empName[], string 
 
 //<-------------------------------inventry management---------------------------------->
 //add mobiles
-void addMobiles(string mobileBrand[],string mobileModel[],string mobileSpecs[],string mobileSupplierName[],string mobileColor[],   int mobileQty[],string mobileStorage[],double mobPurchasePrice[],double mobSalePrice[],int mobMinStockLevel[],double discount[],string status[],bool isMobileExist[],int MaxMobile){
+void addMobiles(string mobileBrand[],string mobileModel[],string mobileSpecs[],string mobileSupplierName[],string mobileColor[],   int mobileQty[],string mobileStorage[],double mobPurchasePrice[],double mobSalePrice[],int mobMinStockLevel[],double discount[],string status[],bool isMobileExist[],int MaxMobile,int mobItemId[],int &mobileCount){
+    system("cls");
+    setTextColor(14); cout << " ===================================" << endl;
+    setTextColor(11); cout << "        --- Add Mobiles ---       " << endl;
+    setTextColor(14); cout << " ===================================" << endl<<endl;
+    if(mobileCount<=MaxMobile){
+        for(int i=0; i<MaxMobile; i++){
+            if(!isMobileExist[i]){
+                cout << "Enter mobile Brand : "; 
+                mobileBrand[i] = correctDataEntry();
+                cout << "Enter model: "; 
+                mobileModel[i] = correctDataEntry();
+                cout << "Enter storage: ";
+                mobileStorage[i] = correctDataEntry();
+                cout << "Enter specs: ";
+                mobileSpecs[i] = correctDataEntry();
+                cout << "Enter mobile color: ";
+                mobileColor[i] = correctDataEntry();
+                cout << "Enter supplier name: ";
+                mobileSupplierName[i] = correctDataEntry();
+                cout << "Enter quantity: ";
+                cin>>mobileQty[i];
+                cout << "Enter purchase Price: ";
+                cin>>mobPurchasePrice[i];
+                cout << "Enter sale Price: ";
+                cin>>mobSalePrice[i];
+                cout << "Enter minimum Stock Level: ";
+                cin>>mobMinStockLevel[i];
+                mobileCount++;
+                mobItemId[i] = i+1;
+                isMobileExist[i] = true;
+                setTextColor(10); //green
+                cout << "\n\t\t\t\t\t\t\t\tMobile added successfully......."<<endl;
+                cin.ignore();
+                cin.get();
+                break;
+            }
+        }
+    }
+    else{
+        setTextColor(12); //red
+        cout<<"\n\tMaximum number of mobiles reached. Cannot add more mobiles!"<<endl;
+        cin.get();
+    }
+    
 
 }
 //add accessories
-void addAccessories( string accessoryName[],string accessorySpecs[],string accessorySupplier[],int accessoryQuantity[],double accessoryPurchasePrice[],double accessorySalePrice[],int accessoryMinStock[],double accessoryDiscount[],string accessoryStatus[],bool isAccessoryExist[],int MaxAccessory){
-
-}
-
-void addInventry(string mobileBrand[],string mobileModel[],string mobileSpecs[],string mobileSupplierName[],string mobileColor[],   int mobileQty[],string mobileStorage[],double mobPurchasePrice[],double mobSalePrice[],int mobMinStockLevel[],double discount[],string status[],bool isMobileExist[],int MaxMobile,int &inventryChoice, //accessories
-string accessoryName[],string accessorySpecs[],string accessorySupplier[],int accessoryQuantity[],double accessoryPurchasePrice[],double accessorySalePrice[],int accessoryMinStock[],double accessoryDiscount[],string accessoryStatus[],bool isAccessoryExist[],int MaxAccessory
-){
+void addAccessories( string accessoryName[],string accessorySpecs[],string accessorySupplier[],int accessoryQuantity[],double accessoryPurchasePrice[],double accessorySalePrice[],int accessoryMinStock[],double accessoryDiscount[],string accessoryStatus[],bool isAccessoryExist[],int MaxAccessory,int &accessoryCount){
     system("cls");
     setTextColor(14); cout << " ===================================" << endl;
-    setTextColor(11); cout << "        --- Add Inventory ---       " << endl;
+    setTextColor(11); cout << "        --- Add Accessory ---       " << endl;
     setTextColor(14); cout << " ===================================" << endl<<endl;
-    setTextColor(14); cout << " 1. "; setTextColor(11); cout << "Add Mobile" << endl;
-    setTextColor(14); cout << " 2. "; setTextColor(11); cout << "Add Accessory" << endl;
-    setTextColor(14); cout << " 0. "; setTextColor(11); cout << "Exit" << endl;
-    setTextColor(14); cout << " ===================================" << endl;
+    if(accessoryCount<=MaxAccessory){
+        for(int i=0; i<MaxAccessory; i++){
+            if(!isAccessoryExist[i]){
+                cout << "Enter accessory name : "; 
+                cin.ignore();
+                accessoryName[i] = correctDataEntry();
+                cin.ignore();
+                cout << "Enter accessory specs : "; 
+                accessorySpecs[i] = correctDataEntry();
+                cout << "Enter supplier name: ";
+                accessorySupplier[i] = correctDataEntry();
+                cout << "Enter quantity: ";
+                cin>>accessoryQuantity[i];
+                cout << "Enter purchase Price: ";
+                cin>>accessoryPurchasePrice[i];
+                cout << "Enter sale Price: ";
+                cin>>accessorySalePrice[i];
+                cout << "Enter minimum Stock Level: ";
+                cin>>accessoryMinStock[i];
+                accessoryCount++;
+                isAccessoryExist[i] = true;
+                setTextColor(10); //green
+                cout << "\n\t\t\t\t\t\t\t\tMobile added successfully......."<<endl;
+                cin.ignore();
+                cin.get();
+                break;
+            }
+        }
+    }
+    else{
+        setTextColor(12); //red
+        cout<<"\n\tMaximum number of accessory reached. Cannot add more accoessory!"<<endl;
+        cin.get();
+    }
+    
+}
+//add inventry
+void addInventry(string mobileBrand[],string mobileModel[],string mobileSpecs[],string mobileSupplierName[],string mobileColor[],   int mobileQty[],string mobileStorage[],double mobPurchasePrice[],double mobSalePrice[],int mobMinStockLevel[],double discount[],string status[],bool isMobileExist[],int MaxMobile,int &inventryChoice,int mobItemId[],int &mobileCount, //accessories
+string accessoryName[],string accessorySpecs[],string accessorySupplier[],int accessoryQuantity[],double accessoryPurchasePrice[],double accessorySalePrice[],int accessoryMinStock[],double accessoryDiscount[],string accessoryStatus[],bool isAccessoryExist[],int MaxAccessory,int &accessoryCount){
     do {
+        system("cls");
+        setTextColor(14); cout << " ===================================" << endl;
+        setTextColor(11); cout << "        --- Add Inventory ---       " << endl;
+        setTextColor(14); cout << " ===================================" << endl;
+        setTextColor(14); cout << " 1. "; setTextColor(11); cout << "Add Mobile" << endl;
+        setTextColor(14); cout << " 2. "; setTextColor(11); cout << "Add Accessory" << endl;
+        setTextColor(14); cout << " 0. "; setTextColor(11); cout << "Exit" << endl;
+        setTextColor(14); cout << " ===================================" << endl;
         inventryChoice = getValidDigitInput(); //assures valid input digit 0-9
         switch (inventryChoice) {
             case 1:{ //add mobile
-                addMobiles(mobileBrand,mobileModel,mobileSpecs,mobileSupplierName,mobileColor,mobileQty,mobileStorage,mobPurchasePrice,mobSalePrice, mobMinStockLevel,discount,status,isMobileExist,MaxMobile);
+                addMobiles(mobileBrand,mobileModel,mobileSpecs,mobileSupplierName,mobileColor,mobileQty,mobileStorage,mobPurchasePrice,mobSalePrice, mobMinStockLevel,discount,status,isMobileExist,MaxMobile,mobItemId,mobileCount);
                 break;
             }  
             case 2:{ //add accessory
-                addAccessories(accessoryName,accessorySpecs,accessorySupplier,accessoryQuantity,accessoryPurchasePrice,accessorySalePrice,accessoryMinStock,accessoryDiscount,accessoryStatus,isAccessoryExist, MaxAccessory);
+                addAccessories(accessoryName,accessorySpecs,accessorySupplier,accessoryQuantity,accessoryPurchasePrice,accessorySalePrice,accessoryMinStock,accessoryDiscount,accessoryStatus,isAccessoryExist, MaxAccessory,accessoryCount);
                 break;
             }
             case 0:{
@@ -830,7 +1003,322 @@ string accessoryName[],string accessorySpecs[],string accessorySupplier[],int ac
     inventryChoice = -1;
 
 }
-//<-------------------------------interfaces functions---------------------------------->
+
+//update mobiles
+void updateMobiles(string mobileBrand[],string mobileModel[],string mobileSpecs[],string mobileSupplierName[],string mobileColor[],   int mobileQty[],string mobileStorage[],double mobPurchasePrice[],double mobSalePrice[],int mobMinStockLevel[],double discount[],string status[],bool isMobileExist[],int MaxMobile,int mobItemId[],int &mobileCount){
+    system("cls");
+    setTextColor(14); cout << " ===================================" << endl;
+    setTextColor(11); cout << "        --- Update Mobiles ---      " << endl;
+    setTextColor(14); cout << " ===================================" << endl<<endl;
+    if(mobileCount!=0){
+        string searchMob;
+        bool Found = false;
+        cout<<"Enter the mobile name : ";
+        searchMob = correctDataEntry();
+        for(int i=0; i<MaxMobile; i++){
+            if(mobileModel[i]== searchMob){
+                cout << "Enter mobile Brand : "; 
+                mobileBrand[i] = correctDataEntry();
+                cout << "Enter model: "; 
+                mobileModel[i] = correctDataEntry();
+                cout << "Enter storage: ";
+                mobileStorage[i] = correctDataEntry();
+                cout << "Enter specs: ";
+                mobileSpecs[i] = correctDataEntry();
+                cout << "Enter mobile color: ";
+                mobileColor[i] = correctDataEntry();
+                cout << "Enter supplier name: ";
+                mobileSupplierName[i] = correctDataEntry();
+                cout << "Enter quantity: ";
+                cin>>mobileQty[i];
+                cout << "Enter purchase Price: ";
+                cin>>mobPurchasePrice[i];
+                cout << "Enter sale Price: ";
+                cin>>mobSalePrice[i];
+                cout << "Enter minimum Stock Level: ";
+                cin>>mobMinStockLevel[i];
+                Found = true;
+                setTextColor(10); //green
+                cout << "\n\t\t\t\t\t\t\t\tMobile updated successfully......."<<endl;
+                cin.get();
+                break;
+            }
+        }
+        if(!Found){
+            setTextColor(12); // Red 
+            cout<<"No mobile exist in list!"<<endl;
+        }
+    }
+    else{
+        setTextColor(12); // Red 
+        cout<<"No Mobile added Yet!"<<endl;
+    }
+    cin.get();
+}
+
+void deleteMobiles(string mobileBrand[],string mobileModel[],string mobileSpecs[],string mobileSupplierName[],string mobileColor[],   int mobileQty[],string mobileStorage[],double mobPurchasePrice[],double mobSalePrice[],int mobMinStockLevel[],double discount[],string status[],bool isMobileExist[],int MaxMobile,int mobItemId[],int &mobileCount){
+    system("cls");
+    setTextColor(14); cout << " ===================================" << endl;
+    setTextColor(11); cout << "        --- Delete Mobiles ---      " << endl;
+    setTextColor(14); cout << " ===================================" << endl<<endl;
+    if(mobileCount!=0){
+        string searchMob;
+        bool Found = false;
+        cout<<"Enter the mobile name : ";
+        searchMob = correctDataEntry();
+        for(int i=0; i<MaxMobile; i++){
+            if(mobileModel[i]== searchMob){
+                mobileBrand[i] = "nv";
+                mobileModel[i] = "nv";
+                mobileStorage[i] = "nv";
+                mobileSpecs[i] = "nv";
+                mobileColor[i] = "nv";
+                mobileSupplierName[i] = "nv";
+                mobileQty[i] = -1;
+                mobPurchasePrice[i] = -1;
+                mobSalePrice[i] = -1;
+                mobMinStockLevel[i] = -1;
+                mobileCount--;
+                mobItemId[i] = -1;
+                isMobileExist[i] = false;
+                Found = true;
+                setTextColor(10); //green
+                cout << "\n\t\t\t\t\t\t\t\tMobile deleted successfully......."<<endl;
+            }
+        }
+        if(!Found){
+            setTextColor(12); // Red 
+            cout<<"No mobile exist in list!"<<endl;
+        }
+    }
+    else{
+        setTextColor(12); // Red 
+        cout<<"No Mobile added Yet!"<<endl;
+    }
+    cin.get();
+}
+
+void viewMobiles(string mobileBrand[],string mobileModel[],string mobileSpecs[],string mobileSupplierName[],string mobileColor[],   int mobileQty[],string mobileStorage[],double mobPurchasePrice[],double mobSalePrice[],int mobMinStockLevel[],double discount[],string status[],bool isMobileExist[],int MaxMobile,int mobItemId[],int &mobileCount,bool isAdmin){
+    system("cls");
+    cout<<endl<<endl;
+    setTextColor(14); cout << "\t\t\t\t\t\t\t\t===================================" << endl;
+    setTextColor(11); cout << "\t\t\t\t\t\t\t\t     --- View all Mobiles ---      " << endl;
+    setTextColor(14); cout << "\t\t\t\t\t\t\t\t===================================" << endl<<endl;
+    cout<<left;
+    if(isAdmin){
+            cout<<" ------------------------------------------------------------------------------------------------------------------------------------------------------------------" << endl;
+        }
+        else{
+            cout<<" ------------------------------------------------------------------------------------------------------------------------" << endl;
+        }
+    cout<<setw(10)<<" | Item Id"<<setw(11)<<" | Brand "<<setw(19)<<"| Model"<<setw(17)<<"| Storage"<<setw(38)<<"| Specs"<<setw(10)<<"| Color";
+    if(isAdmin){
+        cout<<setw(17)<<"| Supplier Name"<<setw(10)<<"| Qty"<<setw(17)<<"| Purchase Price"<<setw(13)<<"| Sale Price"<<"|"<<endl;
+        cout<<" ------------------------------------------------------------------------------------------------------------------------------------------------------------------" << endl;
+    }   
+    else 
+    {
+        cout<<setw(15)<<"|   Price"<<"|"<<endl;
+        cout<<" ------------------------------------------------------------------------------------------------------------------------" << endl;
+    }
+    if(mobileCount!=0){
+        for(int i=0; i<MaxMobile; i++){ 
+            if(isMobileExist[i]){
+                cout << " | " << setw(8) << mobItemId[i] << "| "
+                    << setw(8) <<mobileBrand[i] << "| "
+                     << setw(17) << mobileModel[i] << "| "
+                     << setw(15) << mobileStorage[i] << "| "
+                     << setw(36) << mobileSpecs[i] << "| "
+                     << setw(8) << mobileColor[i] << "| ";
+                    if(isAdmin){
+                        cout<< setw(15) << mobileSupplierName[i] << "| "
+                         << setw(8) << mobileQty[i] << "| "
+                         << setw(15) << mobPurchasePrice[i] << "| "
+                         << setw(11)  << mobSalePrice[i] << "| "
+                         << endl;
+                    }
+                    else{
+                        cout<< setw(13)  << mobSalePrice[i] << "| "<<endl;
+                    }
+            }
+        } //-----------
+        if(isAdmin){
+            cout<<" ------------------------------------------------------------------------------------------------------------------------------------------------------------------" << endl;
+        }
+        else{
+            cout<<" ------------------------------------------------------------------------------------------------------------------------" << endl;
+        }
+    }
+    else{
+        setTextColor(12); // Red 
+        cout << "\n\tNo Mobile added Yet!"<<endl;
+    }
+    cin.get();
+}
+//----------------------------------------------Customer related functions------------------------------------------------>
+
+void addCustomer(string cusUsername[],string cusPwd[],string cusName[],string cusCell[],string cusAddress[],string cusDOB[],string cusGender[],bool isCustomerExit[],int CusSize,int &customerCount){
+    system("cls");
+    setTextColor(14); cout << " ===================================" << endl;
+    setTextColor(11); cout << "        --- Create Profile ---      " << endl;
+    setTextColor(14); cout << " ===================================" << endl;;
+    if(customerCount<CusSize){
+        for(int i=0; i<CusSize; i++){
+            if(!isCustomerExit[i]){
+                cout<<"Enter Username : ";
+                cusUsername[i] = correctDataEntry();
+                cout<<"Enter Password : ";
+                cusPwd[i] = correctDataEntry();
+                cout<<"Enter your name :";
+                cusName[i] = correctDataEntry();
+                cout<<"Enter your phone number : ";
+                cusCell[i] = correctDataEntry();
+                cout<<"Enter your date of birth : ";
+                cusDOB[i] = correctDataEntry();
+                cout<<"Enter your gender : ";
+                cusGender[i] = correctDataEntry();
+                cout<<"Enter your Address : ";
+                cusAddress[i] = correctDataEntry();
+                customerCount++;
+                isCustomerExit[i] = true;
+                setTextColor(10); //green
+                cout << "\n\t\t\t\t\t\t\t\tProfile Created Successfully......."<<endl;
+                cin.get();
+                break;
+            }
+        }
+    }
+    else{
+        setTextColor(12); //red
+        cout<<"\n\tNo more Space to create profile, Please contact with manager!"<<endl;
+        cin.get();
+        }
+}
+
+void updateCustomer(string cusUsername[],string cusPwd[],string cusName[],string cusCell[],string cusAddress[],string cusDOB[],string cusGender[],bool isCustomerExit[],int CusSize,int &customerCount){
+    string username; //for searching by username 
+    bool isUserFound = false; //checks if user found & data updated
+    system("cls");
+    setTextColor(14); cout << " ===================================" << endl;
+    setTextColor(11); cout << "     --- Update Customer Data ---   " << endl;
+    setTextColor(14); cout << " ===================================" << endl;
+    if(customerCount!=0){
+        string username;
+        bool isUserFound = false;
+        cout<<" Enter username of Customer : ";
+        cin>>username;
+        for(int i=0; i<CusSize; i++){
+            if(username == cusUsername[i]){
+                cout<<"Enter Username : ";
+                cin>>cusUsername[i];
+                cout<<"Enter Password : ";
+                cin.ignore();
+                cusPwd[i] = correctDataEntry();
+                cout<<"Enter your name :";
+                cusName[i] = correctDataEntry();
+                cout<<"Enter your phone number : ";
+                cusCell[i] = correctDataEntry();
+                cout<<"Enter your date of birth : ";
+                cusDOB[i] = correctDataEntry();
+                cout<<"Enter your gender : ";
+                cusGender[i] = correctDataEntry();
+                cout<<"Enter your Address : ";
+                cusAddress[i] = correctDataEntry();
+                isUserFound = true;
+                setTextColor(10); //green
+                cout << "\n\t\t\t\t\t\t\t\tEmployee data updated successfully......."<<endl;
+                break;
+            }
+        }
+        if(!isUserFound){
+            setTextColor(12); // Red 
+            cout<<"\n  No user found!";
+            cin.get();
+        }
+    }
+    else{
+        setTextColor(12); // Red 
+        cout << "\nNo employee added yet!"<<endl;
+    }
+    cin.get();
+}
+
+void deleteCustomer(string cusUsername[],string cusPwd[],string cusName[],string cusCell[],string cusAddress[],string cusDOB[],string cusGender[],bool isCustomerExit[],int CusSize,int &customerCount){
+    system("cls");
+    setTextColor(14); cout << " ===================================" << endl;
+    setTextColor(11); cout << "   --- Delete Customer account ---  " << endl;
+    setTextColor(14); cout << " ===================================" << endl;
+    if(customerCount!=0){
+        string username;
+        bool isUserFound = false;
+        cout<<" Enter username of Customer : ";
+        cin>>username;
+        for(int i=0; i<CusSize; i++){
+            if(username == cusUsername[i]){
+                cusUsername[i] = "nv";
+                cusPwd[i] = "nv";
+                cusName[i] = "nv";
+                cusCell[i] = "nv";
+                cusAddress[i] = "nv";
+                cusDOB[i] = "nv";
+                cusGender[i] = "nv";
+                isCustomerExit[i] = false;
+                customerCount--;
+                isCustomerExit[i] = false;
+                isUserFound = true;
+                setTextColor(10); //green
+                cout << "\n\t\t\t\t\t\t\t\tCustomer data deleted successfully......."<<endl;
+                cin.get();
+                break;
+            }
+        }
+        if(!isUserFound){
+            setTextColor(12); // Red 
+            cout<<"\n No user found!";
+            cin.get();
+        }
+    }
+    else{
+        setTextColor(12); // Red 
+        cout << "\nNo customer created his/her account yet!"<<endl;
+    }
+    cin.get();    
+}
+
+
+void viewAllCustomer(string cusUsername[],string cusPwd[],string cusName[],string cusCell[],string cusAddress[],string cusDOB[],string cusGender[],bool isCustomerExit[],int CusSize,int &customerCount){
+    system("cls");
+    cout<<endl<<endl;
+    setTextColor(14); cout << "\t\t\t\t\t\t\t===================================" << endl;
+    setTextColor(11); cout << "\t\t\t\t\t\t\t     --- Customers Details ---     " << endl;
+    setTextColor(14); cout << "\t\t\t\t\t\t\t===================================" << endl<<endl;
+    cout<<left;
+    cout<<" ----------------------------------------------------------------------------------------------------------------------------------------------------" << endl;
+    cout<<setw(16)<<" | Username "<<setw(16)<<"| Password"<<setw(20)<<"| Customer Name"<<setw(16)<<"| Phone No"<<setw(15)<<"| DOB"<<setw(10)<<"| Gender"<<setw(55)<<"| Address"<<"|"<<endl;
+    cout<<" ----------------------------------------------------------------------------------------------------------------------------------------------------" << endl;
+    if(customerCount!=0){ 
+        for(int i=0; i<CusSize; i++){ 
+            if(isCustomerExit[i]){
+                cout << " | " << setw(13) <<cusUsername[i] << "| "
+                     << setw(14) << cusPwd[i] << "| "
+                     << setw(18) << cusName[i] << "| "
+                     << setw(14) << cusCell[i] << "| "
+                     << setw(13) << cusDOB[i] << "| "
+                     << setw(8) << cusGender[i] << "| "
+                     << setw(53) << cusAddress[i] << "| "
+                     << endl;
+            }
+        }
+        cout<<" ----------------------------------------------------------------------------------------------------------------------------------------------------" << endl;   
+    }
+    else{
+        setTextColor(12); // Red 
+        cout << "\n\tNo Customer Found!"<<endl;
+    }
+    cin.get();
+}
+
+//<------------------------------------interfaces functions---------------------------------->
 void mainInterface() {
     system("cls"); // clears the screen
     setTextColor(11); // for color changing to aqua
@@ -943,8 +1431,9 @@ void customerManagementHeader(){
 void managerCustomerManagement() {
     customerManagementHeader();
     setTextColor(14); cout << " 1. "; setTextColor(11); cout << "View All Customers" << endl;
-    setTextColor(14); cout << " 2. "; setTextColor(11); cout << "Delete Customer Account" << endl;
-    setTextColor(14); cout << " 3. "; setTextColor(11); cout << "View Purchase History" << endl;
+    setTextColor(14); cout << " 2. "; setTextColor(11); cout << "Update customer data" << endl;
+    setTextColor(14); cout << " 3. "; setTextColor(11); cout << "Delete Customer Account" << endl;
+    setTextColor(14); cout << " 4. "; setTextColor(11); cout << "View Purchase History" << endl;
     setTextColor(14); cout << " 0. "; setTextColor(11); cout << "Exit" << endl;
 
     setTextColor(14); cout << " ====================================" << endl;
@@ -1022,6 +1511,12 @@ void employeeOrderManagement() {
 }
 
 //<-------------------------------Customer interfaces functions---------------------------------->
+void customerLoginHeader() {
+    system("cls");
+    setTextColor(14); cout << " ===================================" << endl;
+    setTextColor(11); cout << "        --- Customer Login ---       " << endl;
+    setTextColor(14); cout << " ===================================" << endl;
+}
 // Customer Portal
 void customerPortalHeader(){
     system("cls");
@@ -1075,6 +1570,11 @@ void customerProfileMenu() {
     cout << "Order Tracking" << endl;
 
     setTextColor(14);
+    cout << " 4. ";
+    setTextColor(11);
+    cout << "Update profile" << endl;
+
+    setTextColor(14);
     cout << " 0. ";
     setTextColor(11);
     cout << "Exit" << endl;
@@ -1086,23 +1586,27 @@ void customerProfileMenu() {
 void customerWithoutLoginMenu() {
     customerPortalHeader(); //shows customer portal header
 
-    setTextColor(14); 
-    cout << " 1. "; 
-    setTextColor(11); 
+   setTextColor(14);
+    cout << " 1. ";
+    setTextColor(11);
     cout << "View Available Items" << endl;
-    setTextColor(14); 
-    cout << " 2. "; 
-    setTextColor(11); 
-    cout << "Place an Order (Limited)" << endl; 
-    setTextColor(14); 
-    cout << " 3. "; 
-    setTextColor(11); 
-    cout << "Order Tracking (Limited)" << endl; 
-    setTextColor(14); 
-    cout << " 0. "; 
-    setTextColor(11); 
+
+    setTextColor(14);
+    cout << " 2. ";
+    setTextColor(11);
+    cout << "Place an Order" << endl;
+
+    setTextColor(14);
+    cout << " 3. ";
+    setTextColor(11);
+    cout << "Order Tracking" << endl;
+
+    setTextColor(14);
+    cout << " 0. ";
+    setTextColor(11);
     cout << "Exit" << endl;
-    setTextColor(14); 
+
+    setTextColor(14);
     cout << " ===================================" << endl;
 }
 
