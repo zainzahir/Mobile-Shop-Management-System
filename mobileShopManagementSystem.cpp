@@ -3,6 +3,7 @@
 #include <string>
 #include <iomanip>
 #include <conio.h> //used to use _getch() in masked pass
+#include <fstream>
 using namespace std;
 //<-------------constants of 2D array----------------------->
 const int MaxOrder = 10; // 10 orders per person
@@ -45,6 +46,7 @@ int getValidDigitInput();     // make sure input is 0 - 9 single digit
 string correctDataEntry();    // ensures user enter b/w (A to Z) & 0 - 9
 string maskedInputPass();     // input masked password from user
 void setTextColor(int color); // changes the color of specific text
+int stringToInt(string str); //change string to int
 
 //<------------------employee management-------------------------->
 // add employee
@@ -69,7 +71,7 @@ void viewMobiles(string mobileBrand[], string mobileModel[], string mobileSpecs[
 
 //<-----------------------customer order management---------------------------------------->
 void cusOrderManagment(string mobileBrand[], string mobileModel[], string mobileColor[], int mobileQty[], string mobileStorage[], int mobPurchasePrice[], int mobSalePrice[], double discount[], string status[], bool isMobileExist[], int MaxMobile, int mobItemId[], int &mobileCount, int orderQty[][MaxOrder], int orders[][MaxOrder], int orderPrices[][MaxOrder], int orderCounts[], bool isOrderExist[][MaxOrder], string orderStatus[][MaxOrder], int MaxOrder, int CusSize, bool isCustomerExit[], string cusUsername[], string cusName[]);
-void managePendingOrders(string mobileBrand[], string mobileModel[], string mobileColor[], int mobileQty[], string mobileStorage[], int mobPurchasePrice[], int mobSalePrice[], double discount[], string status[], bool isMobileExist[], int MaxMobile, int mobItemId[], int &mobileCount, int mobProfit[], int orderQty[][MaxOrder], int orders[][MaxOrder], int orderPrices[][MaxOrder], int orderCounts[], bool isOrderExist[][MaxOrder], string orderStatus[][MaxOrder], int MaxOrder, int CusSize, bool isCustomerExit[], string cusUsername[], string cusName[]);
+void managePendingOrders(string mobileBrand[], string mobileModel[], string mobileColor[], int mobileQty[], string mobileStorage[], int mobPurchasePrice[], int mobSalePrice[], double discount[], string status[], bool isMobileExist[], int MaxMobile, int mobItemId[], int &mobileCount, int mobProfit[], int orderQty[][MaxOrder], int orders[][MaxOrder], int orderPrices[][MaxOrder], int orderCounts[], bool isOrderExist[][MaxOrder], string orderStatus[][MaxOrder], int MaxOrder, int CusSize, bool isCustomerExit[], string cusUsername[], string cusName[], bool isProfitExist[]);
 //<------------------Customer profiles-------------------------->
 void addCustomer(string cusUsername[], string cusPwd[], string cusName[], string cusCell[], string cusAddress[], string cusDOB[], string cusGender[], bool isCustomerExit[], int CusSize, int &customerCount);
 void viewAllCustomer(string cusUsername[], string cusPwd[], string cusName[], string cusCell[], string cusAddress[], string cusDOB[], string cusGender[], bool isCustomerExit[], int CusSize, int &customerCount);
@@ -81,7 +83,16 @@ void updateCustomer(string cusUsername[], string cusPwd[], string cusName[], str
 int findCustomerIndex(string username, string pwd, string cusUsername[], string cusPwd[], int CusSize);
 void placeOrder(string mobileBrand[], string mobileModel[], string mobileSpecs[], string mobileSupplierName[], string mobileColor[], int mobileQty[], string mobileStorage[], int mobPurchasePrice[], int mobSalePrice[], int mobMinStockLevel[], double discount[], string status[], bool isMobileExist[], int MaxMobile, int mobItemId[], int &mobileCount, bool isAdmin, int orderQty[][MaxOrder], int orders[][MaxOrder], int orderPrices[][MaxOrder], int orderCounts[], bool isOrderExist[][MaxOrder], string orderStatus[][MaxOrder], int MaxOrder, int CusSize, string username, string pwd, string cusUsername[], string cusPwd[]);
 void orderTracking(string mobileBrand[], string mobileModel[], string mobileColor[], string mobileStorage[], int mobSalePrice[], double discount[], bool isMobileExist[], int MaxMobile, int mobItemId[], int orderQty[][MaxOrder], int orders[][MaxOrder], int orderPrices[][MaxOrder], int orderCounts[], bool isOrderExist[][MaxOrder], string orderStatus[][MaxOrder], int MaxOrder, int CusSize, string username, string pwd, string cusUsername[], string cusPwd[]);
-
+//<------------------------file handling--------------------------------->
+//<----------------------Employee data save & laod-------------------------------->
+void saveEmployeeData(string empUsername[], string empPwd[], string empName[], string empFname[], string empCellNo[], string empAddress[], string empCnic[], string empDOB[], char empGender[], bool isEmpExist[], int EmpSize, int &empCount);
+void loadEmployeeData(string empUsername[], string empPwd[], string empName[], string empFname[], string empCellNo[], string empAddress[], string empCnic[], string empDOB[], char empGender[], bool isEmpExist[], int EmpSize, int &empCount);
+//<-------------------------------customer data save & load--------------------------------->
+void SaveCustomerData(string cusUsername[], string cusPwd[], string cusName[], string cusCell[], string cusAddress[], string cusDOB[], string cusGender[], bool isCustomerExit[], int CusSize, int &customerCount);
+//<-------------------------------inventry data save & load--------------------------------->
+void saveInventryData(string mobileBrand[], string mobileModel[], string mobileSpecs[], string mobileSupplierName[], string mobileColor[], int mobileQty[], string mobileStorage[], int mobPurchasePrice[], int mobSalePrice[], int mobMinStockLevel[], double discount[], string status[], bool isMobileExist[], int MaxMobile, int mobItemId[], int &mobileCount);
+//<-------------------------------order data save & load--------------------------------->
+void savePendingOrders(string cusName[], string cusUsername[],bool isCustomerExit[], int orders[][10], string mobileBrand[], string mobileModel[], string mobileStorage[], string mobileColor[], double mobSalePrice[],int orderQty[][10],int mobItemId[], string orderStatus[][10], bool isOrderExist[][10], int MaxOrder, int MaxMobile, int CusSize);
 int main()
 {
     //<--------------for authentication--------------->
@@ -91,8 +102,8 @@ int main()
 
     //<------------manager attributes--------------->
     string managerPWD, managerUsername;
-    managerUsername = "Admin"; // admin username
-    managerPWD = "admin123";   // admin password
+    managerUsername = "z"; // admin username
+    managerPWD = "z";      // admin password
     int managerChoice = -1;
 
     //<------------employee attributes------------------->
@@ -159,9 +170,7 @@ int main()
     // mobiles
     const int MaxMobile = 30; // max no. of items
     int mobProfit[MaxMobile];
-    enum MobProfit {brand,mblModel,profit};
-    string isProfitExist[MaxMobile];
-    string mobProfit[MaxMobile][3];
+    bool isProfitExist[MaxMobile];
     int mobItemId[MaxMobile];
     string mobileBrand[MaxMobile];
     string mobileModel[MaxMobile];
@@ -205,6 +214,7 @@ int main()
         discount[i] = 0;
         status[i] = "nv";
         isMobileExist[i] = false;
+        isProfitExist[i] = false;
     }
     // order management attributes
     bool foundPendingOrder = false;
@@ -231,7 +241,8 @@ int main()
             isOrderExist[i][j] = false;
         }
     }
-
+    //<------------------Load data------------------------>
+    loadEmployeeData(empUsername, empPwd, empName, empFname, empCellNo, empAddress, empCnic, empDOB, empGender, isEmpExist, EmpSize, empCount);
     do
     {
         mainInterface();
@@ -252,8 +263,7 @@ int main()
             cout << " Enter Password: ";
             setTextColor(11);
             pwd = maskedInputPass(); // calls the function to take input and save in pwd
-            // if (username == managerUsername && pwd == managerPWD)
-            if (true) // delete this line after u done testing
+            if (username == managerUsername && pwd == managerPWD)
                 loggedInUserType = 1;
             else
             {
@@ -510,7 +520,7 @@ int main()
                 }
                 case 4:
                 { // order management
-                    managePendingOrders(mobileBrand, mobileModel, mobileColor, mobileQty, mobileStorage, mobPurchasePrice, mobSalePrice, discount, status, isMobileExist, MaxMobile, mobItemId, mobileCount, mobProfit, orderQty, orders, orderPrices, orderCounts, isOrderExist, orderStatus, MaxOrder, CusSize, isCustomerExit, cusUsername, cusName);
+                    managePendingOrders(mobileBrand, mobileModel, mobileColor, mobileQty, mobileStorage, mobPurchasePrice, mobSalePrice, discount, status, isMobileExist, MaxMobile, mobItemId, mobileCount, mobProfit, orderQty, orders, orderPrices, orderCounts, isOrderExist, orderStatus, MaxOrder, CusSize, isCustomerExit, cusUsername, cusName, isProfitExist);
                     break;
                 }
                 // case 5:
@@ -614,7 +624,7 @@ int main()
                 }
                 case 3:
                 {
-                    managePendingOrders(mobileBrand, mobileModel, mobileColor, mobileQty, mobileStorage, mobPurchasePrice, mobSalePrice, discount, status, isMobileExist, MaxMobile, mobItemId, mobileCount, mobProfit, orderQty, orders, orderPrices, orderCounts, isOrderExist, orderStatus, MaxOrder, CusSize, isCustomerExit, cusUsername, cusName);
+                    managePendingOrders(mobileBrand, mobileModel, mobileColor, mobileQty, mobileStorage, mobPurchasePrice, mobSalePrice, discount, status, isMobileExist, MaxMobile, mobItemId, mobileCount, mobProfit, orderQty, orders, orderPrices, orderCounts, isOrderExist, orderStatus, MaxOrder, CusSize, isCustomerExit, cusUsername, cusName, isProfitExist);
                     break;
                 }
                 case 0:
@@ -747,7 +757,25 @@ int getValidDigitInput()
         // after this again asked for input untill correct input
     } while (!isDigit);
 }
-
+int stringToInt(string str){
+    int result =0;
+    bool isNegative = false;
+    int i = 0;
+    if(str[0]=='-'){
+        isNegative = true;
+        i = 1;
+    }
+    for(i; i<str.length(); i++){
+        if(str[i]>='0' && str[i]<='9'){
+            result = result* 10 + (str[i] - '0'); //change into int by - '0'
+        }
+        else{
+            cout<<"Invalid string";
+            return 0;
+        }
+    }
+    return isNegative? -result: result;
+}
 // used in default case of switch to show invalid choice
 void invalidErrorMessage()
 {
@@ -867,6 +895,7 @@ void addEmployee(string empUsername[], string empPwd[], string empName[], string
         cout << "\n\tMaximum number of employees reached. Cannot add more employees!" << endl;
         cin.get();
     }
+    saveEmployeeData(empUsername, empPwd, empName, empFname, empCellNo, empAddress, empCnic, empDOB, empGender, isEmpExist, EmpSize, empCount);
 }
 // Uemp :
 void updateEmployee(string empUsername[], string empPwd[], string empName[], string empFname[], string empCellNo[], string empAddress[], string empCnic[], string empDOB[], char empGender[], bool isEmpExist[], int EmpSize, int &empCount)
@@ -926,6 +955,7 @@ void updateEmployee(string empUsername[], string empPwd[], string empName[], str
         setTextColor(12); // Red
         cout << "\nNo employee added yet!" << endl;
     }
+    saveEmployeeData(empUsername, empPwd, empName, empFname, empCellNo, empAddress, empCnic, empDOB, empGender, isEmpExist, EmpSize, empCount);
     cin.get();
 }
 void deleteEmployee(string empUsername[], string empPwd[], string empName[], string empFname[], string empCellNo[], string empAddress[], string empCnic[], string empDOB[], char empGender[], bool isEmpExist[], int EmpSize, int &empCount)
@@ -979,6 +1009,7 @@ void deleteEmployee(string empUsername[], string empPwd[], string empName[], str
         cout << "\nNo employee added yet!" << endl;
     }
     cin.get();
+    saveEmployeeData(empUsername, empPwd, empName, empFname, empCellNo, empAddress, empCnic, empDOB, empGender, isEmpExist, EmpSize, empCount);
 }
 
 // view employees
@@ -1071,6 +1102,7 @@ void addMobiles(string mobileBrand[], string mobileModel[], string mobileSpecs[]
                 isMobileExist[i] = true;
                 setTextColor(10); // green
                 cout << "\n\t\t\t\t\t\t\t\tMobile added successfully......." << endl;
+                saveInventryData(mobileBrand, mobileModel, mobileSpecs, mobileSupplierName, mobileColor, mobileQty, mobileStorage, mobPurchasePrice, mobSalePrice, mobMinStockLevel, discount, status, isMobileExist, MaxMobile, mobItemId, mobileCount);
                 cin.ignore();
                 cin.get();
                 break;
@@ -1231,6 +1263,7 @@ void updateMobiles(string mobileBrand[], string mobileModel[], string mobileSpec
                 Found = true;
                 setTextColor(10); // green
                 cout << "\n\t\t\t\t\t\t\t\tMobile updated successfully......." << endl;
+                saveInventryData(mobileBrand, mobileModel, mobileSpecs, mobileSupplierName, mobileColor, mobileQty, mobileStorage, mobPurchasePrice, mobSalePrice, mobMinStockLevel, discount, status, isMobileExist, MaxMobile, mobItemId, mobileCount);
                 cin.get();
                 break;
             }
@@ -1247,6 +1280,7 @@ void updateMobiles(string mobileBrand[], string mobileModel[], string mobileSpec
         cout << "No Mobile added Yet!" << endl;
     }
     cin.get();
+   
 }
 
 void deleteMobiles(string mobileBrand[], string mobileModel[], string mobileSpecs[], string mobileSupplierName[], string mobileColor[], int mobileQty[], string mobileStorage[], int mobPurchasePrice[], int mobSalePrice[], int mobMinStockLevel[], double discount[], string status[], bool isMobileExist[], int MaxMobile, int mobItemId[], int &mobileCount)
@@ -1285,6 +1319,7 @@ void deleteMobiles(string mobileBrand[], string mobileModel[], string mobileSpec
                 Found = true;
                 setTextColor(10); // green
                 cout << "\n\t\t\t\t\t\t\t\tMobile deleted successfully......." << endl;
+                saveInventryData(mobileBrand, mobileModel, mobileSpecs, mobileSupplierName, mobileColor, mobileQty, mobileStorage, mobPurchasePrice, mobSalePrice, mobMinStockLevel, discount, status, isMobileExist, MaxMobile, mobItemId, mobileCount);
             }
         }
         if (!Found)
@@ -1438,8 +1473,7 @@ void cusOrderManagment(string mobileBrand[], string mobileModel[], string mobile
     }
 }
 
-
-void managePendingOrders(string mobileBrand[], string mobileModel[], string mobileColor[], int mobileQty[], string mobileStorage[], int mobPurchasePrice[], int mobSalePrice[], double discount[], string status[], bool isMobileExist[], int MaxMobile, int mobItemId[], int &mobileCount, int mobProfit[], int orderQty[][MaxOrder], int orders[][MaxOrder], int orderPrices[][MaxOrder], int orderCounts[], bool isOrderExist[][MaxOrder], string orderStatus[][MaxOrder], int MaxOrder, int CusSize, bool isCustomerExit[], string cusUsername[], string cusName[])
+void managePendingOrders(string mobileBrand[], string mobileModel[], string mobileColor[], int mobileQty[], string mobileStorage[], int mobPurchasePrice[], int mobSalePrice[], double discount[], string status[], bool isMobileExist[], int MaxMobile, int mobItemId[], int &mobileCount, int mobProfit[], int orderQty[][MaxOrder], int orders[][MaxOrder], int orderPrices[][MaxOrder], int orderCounts[], bool isOrderExist[][MaxOrder], string orderStatus[][MaxOrder], int MaxOrder, int CusSize, bool isCustomerExit[], string cusUsername[], string cusName[], bool isProfitExist[])
 {
     int choice;
     int stChoice;
@@ -1481,27 +1515,27 @@ void managePendingOrders(string mobileBrand[], string mobileModel[], string mobi
                 stChoice = getValidDigitInput();
                 switch (stChoice)
                 {
-                    case 1:
-                    {
-                        updateStatus = "Shipped";
-                        break;
-                    }
-                    case 2:
-                    {
-                        updateStatus =  "Delivered";
-                        break;
-                    }
-                    case 3:
-                    {
-                        updateStatus = "Out of Stock";
-                        break;
-                    }
-                    default:
-                    {
-                        invalidErrorMessage(); // shows invalid error message
-                    }
+                case 1:
+                {
+                    updateStatus = "Shipped";
+                    break;
                 }
-            } while (stChoice!=1 &&stChoice!=2 && stChoice!=3);
+                case 2:
+                {
+                    updateStatus = "Delivered";
+                    break;
+                }
+                case 3:
+                {
+                    updateStatus = "Out of Stock";
+                    break;
+                }
+                default:
+                {
+                    invalidErrorMessage(); // shows invalid error message
+                }
+                }
+            } while (stChoice != 1 && stChoice != 2 && stChoice != 3);
             stChoice = -1;
             for (int cus = 0; cus < CusSize; cus++) // customer rows
             {
@@ -1524,6 +1558,7 @@ void managePendingOrders(string mobileBrand[], string mobileModel[], string mobi
                                         {
                                             mobileQty[k] -= orderQty[cus][cusField];
                                             mobProfit[k] = mobSalePrice[k] - mobPurchasePrice[k];
+                                            isProfitExist[k] = true;
                                         }
                                         isItemIdCorrect = true;
                                         setTextColor(10); // green
@@ -1601,6 +1636,7 @@ void addCustomer(string cusUsername[], string cusPwd[], string cusName[], string
                 isCustomerExit[i] = true;
                 setTextColor(10); // green
                 cout << "\n\t\t\t\t\t\t\t\tProfile Created Successfully......." << endl;
+                SaveCustomerData(cusUsername, cusPwd, cusName, cusCell, cusAddress, cusDOB, cusGender, isCustomerExit, CusSize, customerCount);
                 cin.get();
                 break;
             }
@@ -1612,6 +1648,7 @@ void addCustomer(string cusUsername[], string cusPwd[], string cusName[], string
         cout << "\n\tNo more Space to create profile, Please contact with manager!" << endl;
         cin.get();
     }
+   
 }
 
 void updateCustomer(string cusUsername[], string cusPwd[], string cusName[], string cusCell[], string cusAddress[], string cusDOB[], string cusGender[], bool isCustomerExit[], int CusSize, int &customerCount)
@@ -1653,6 +1690,8 @@ void updateCustomer(string cusUsername[], string cusPwd[], string cusName[], str
                 isUserFound = true;
                 setTextColor(10); // green
                 cout << "\n\t\t\t\t\t\t\t\tCustomer data updated successfully......." << endl;
+                SaveCustomerData(cusUsername, cusPwd, cusName, cusCell, cusAddress, cusDOB, cusGender, isCustomerExit, CusSize, customerCount);
+                cin.get();
                 break;
             }
         }
@@ -1668,7 +1707,7 @@ void updateCustomer(string cusUsername[], string cusPwd[], string cusName[], str
         setTextColor(12); // Red
         cout << "\nNo employee added yet!" << endl;
     }
-    cin.get();
+   
 }
 
 void deleteCustomer(string cusUsername[], string cusPwd[], string cusName[], string cusCell[], string cusAddress[], string cusDOB[], string cusGender[], bool isCustomerExit[], int CusSize, int &customerCount)
@@ -1703,6 +1742,8 @@ void deleteCustomer(string cusUsername[], string cusPwd[], string cusName[], str
                 isUserFound = true;
                 setTextColor(10); // green
                 cout << "\n\t\t\t\t\t\t\t\tCustomer data deleted successfully......." << endl;
+                SaveCustomerData(cusUsername, cusPwd, cusName, cusCell, cusAddress, cusDOB, cusGender, isCustomerExit, CusSize, customerCount);
+                cin.get();
                 cin.get();
                 break;
             }
@@ -1719,7 +1760,7 @@ void deleteCustomer(string cusUsername[], string cusPwd[], string cusName[], str
         setTextColor(12); // Red
         cout << "\nNo customer created his/her account yet!" << endl;
     }
-    cin.get();
+    
 }
 
 void viewAllCustomer(string cusUsername[], string cusPwd[], string cusName[], string cusCell[], string cusAddress[], string cusDOB[], string cusGender[], bool isCustomerExit[], int CusSize, int &customerCount)
@@ -1864,6 +1905,7 @@ void placeOrder(string mobileBrand[], string mobileModel[], string mobileSpecs[]
         setTextColor(12); // Red
         cout << "\n\tNo Mobile added Yet!" << endl;
     }
+    // savePendingOrders(cusName,cusUsername,bool isCustomerExit, int orders[10], string mobileBrand, string mobileModel, string mobileStorage, string mobileColor, double mobSalePrice,int orderQty[10],int mobItemId, string orderStatus[1, bool isOrderExist[10], int MaxOrder, int MaxMobile, int CusSize);
     cin.get();
 }
 // order tracking
@@ -1917,7 +1959,7 @@ void orderTracking(string mobileBrand[], string mobileModel[], string mobileColo
             }
         }
         cout << "\t\t ------------------------------------------------------------------------------------------------------------------" << endl;
-        cout << "\t\t   Grand Total :      " << grandTotal<<" rupees" <<endl;
+        cout << "\t\t   Grand Total :      " << grandTotal << " rupees" << endl;
         cout << "\t\t ------------------------------------------------------------------------------------------------------------------" << endl;
     }
     else
@@ -2319,3 +2361,160 @@ void customerWithoutLoginMenu()
     setTextColor(14);
     cout << " ===================================" << endl;
 }
+//<--------------------------------------------file handling------------------------------------>
+//<----------------------------Employee data----------------------------------------->
+void saveEmployeeData(string empUsername[], string empPwd[], string empName[], string empFname[], string empCellNo[], string empAddress[], string empCnic[], string empDOB[], char empGender[], bool isEmpExist[], int EmpSize, int &empCount)
+{
+    ofstream fout;
+    fout.open("employeeData.txt");
+    if (!fout)
+    {
+        cout << "Error: Could not open employees.txt for reading!" << endl;
+        return;
+    }
+    for (int i = 0; i < EmpSize; i++)
+    {
+        if (isEmpExist[i])
+        {
+            fout << empUsername[i] << "," << empPwd[i] << "," << empName[i] << "," << empFname[i] << ","
+                 << empCellNo[i] << "," << empAddress[i] << "," << empCnic[i] << "," << empDOB[i] << ","
+                 << empGender[i] << endl;
+        }
+    }
+    fout.close();
+}
+
+void loadEmployeeData(string empUsername[], string empPwd[], string empName[], string empFname[], string empCellNo[], string empAddress[], string empCnic[], string empDOB[], char empGender[], bool isEmpExist[], int EmpSize, int &empCount)
+{
+    ifstream fin;
+    fin.open("employeeData.txt");
+    ifstream inFile("employees.txt");
+    if (!inFile)
+    {
+        cout << "Error: Could not open employees.txt for reading!" << endl;
+        return;
+    }
+
+    int i = 0;
+    string str = "";
+    while (i<EmpSize && !fin.eof())
+    {
+        getline(fin,empUsername[i],','); 
+        getline(fin,empPwd[i],','); 
+        getline(fin,empName[i],',');
+        getline(fin,empFname[i],',');
+        getline(fin,empCellNo[i],',');
+        getline(fin,empAddress[i],',');
+        getline(fin,empCnic[i],',');
+        getline(fin,empDOB[i],',');
+        fin>>empGender[i];
+        fin.ignore();
+        empCount++;
+        isEmpExist[i] = true;
+        i++;
+    }
+    fin.close();
+    if (i == 0)
+    {
+        cout << "Warning: The file is empty or contains no valid data." << endl;
+    }
+    return;
+}
+//<----------------------------customer data save & load---------------------------------->
+void SaveCustomerData(string cusUsername[], string cusPwd[], string cusName[], string cusCell[], string cusAddress[], string cusDOB[], string cusGender[], bool isCustomerExit[], int CusSize, int &customerCount)
+{
+    ofstream fout;
+    fout.open("customerData.txt");
+    if (!fout)
+    {
+        cout << "Error: Could not open employees.txt for reading!" << endl;
+        return;
+    }
+    for (int i = 0; i < CusSize; i++)
+    {
+        if (isCustomerExit[i])
+        {
+            fout << cusUsername[i] << "," << cusPwd[i] << "," << cusName[i] << "," << cusCell[i] << "," << cusDOB[i] << "," << cusGender[i] << "," << cusAddress[i] << endl;
+        }
+    }
+    fout.close();
+}
+//<----------------------------inventry data save & load---------------------------------->
+void saveInventryData(string mobileBrand[], string mobileModel[], string mobileSpecs[], string mobileSupplierName[], string mobileColor[], int mobileQty[], string mobileStorage[], int mobPurchasePrice[], int mobSalePrice[], int mobMinStockLevel[], double discount[], string status[], bool isMobileExist[], int MaxMobile, int mobItemId[], int &mobileCount)
+{
+    ofstream fout;
+    fout.open("inventryData.txt");
+    if (!fout)
+    {
+        cout << "Error: Could not open employees.txt for reading!" << endl;
+        return;
+    }
+
+    for (int i = 0; i < MaxMobile; i++)
+    {
+        if (isMobileExist[i])
+        {
+            fout << mobileBrand[i] << ","
+                 << mobileModel[i] << ","
+                 << mobileStorage[i] << ","
+                 << mobileSpecs[i] << ","
+                 << mobileColor[i] << ","
+                 << mobileSupplierName[i] << ","
+                 << mobileQty[i] << ","
+                 << mobPurchasePrice[i] << ","
+                 << mobSalePrice[i] << ","
+                 << mobMinStockLevel[i] << endl;
+        }
+    }
+    fout.close();
+}
+//<----------------------------save pending order------------------------------->
+void savePendingOrders(string cusName[], string cusUsername[],bool isCustomerExit[], int orders[][10], string mobileBrand[], string mobileModel[], string mobileStorage[], string mobileColor[], double mobSalePrice[],int orderQty[][10],int mobItemId[], string orderStatus[][10], bool isOrderExist[][10], int MaxOrder, int MaxMobile, int CusSize) {
+    
+    ofstream fout("pending_orders.txt");
+    if (!fout) {
+        cout << "Error: Could not open pending_orders.txt for writing!" << endl;
+        return;
+    }
+
+    for (int cus = 0; cus < CusSize; cus++) {
+        if (isCustomerExit[cus]) {
+            for (int cusField = 0; cusField < MaxOrder; cusField++) {
+                if (isOrderExist[cus][cusField]) {
+                    for (int k = 0; k < MaxMobile; k++) {
+                        if (orders[cus][cusField] == mobItemId[k]) {
+                            fout << cusName[cus] << "," 
+                                 << cusUsername[cus] << "," 
+                                 << mobItemId[k] << "," 
+                                 << mobileBrand[k] << "," 
+                                 << mobileModel[k] << "," 
+                                 << mobileStorage[k] << "," 
+                                 << mobileColor[k] << "," 
+                                 << mobSalePrice[k] << "," 
+                                 << orderQty[cus][cusField] << "," 
+                                 << orderQty[cus][cusField] * mobSalePrice[k] << "," 
+                                 << orderStatus[cus][cusField] << endl;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fout.close();
+}
+
+/*
+ofstream fout;
+    fout.open("dsads");
+    if (fout.is_open())
+    {
+
+        fout.close();
+    }
+    else
+    {
+        cout << "Error: Could not open eemployeeData.txt for writing!" << endl;
+    }
+
+    */
