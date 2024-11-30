@@ -40,7 +40,7 @@ void customerProfileMenu();      // customer within profile options
 void customerWithoutLoginMenu(); ////customer without having a profile
 
 // other functionalities
-//<---------------validations----------------------->
+//<---------------employee and customer validations----------------------->
 void invalidErrorMessage();   // invalid option error
 int getValidDigitInput();     // make sure input is 0 - 9 single digit
 string correctDataEntry();    // ensures user enter b/w (A to Z) & 0 - 9
@@ -51,9 +51,15 @@ string validPhoneNo();
 string validName();
 string validAddress();
 string validUsername();
-string validPwd(); //check user enter valid pwd at time of creating account
+string validPwd(); // check user enter valid pwd at time of creating account
+//<---------------------mobile validations-------------------->
+string validModelName();
+string validStorage();
+string validSpecs();
+int validIntInput(const string& fieldName, int minValue, int maxValue);
 //<-------------smart functions---------------------->
-int stringToInt(string str);                             // change string to int
+int stringToInt(string str);          // change string to int
+string intToString(int number);
 string tokenizer(string str, int field);                 // seperate by comma help in file handling
 int convertToInt(const string &str, int start, int end); // for date manuplation used
 int LengthOf(const string &str);
@@ -68,21 +74,18 @@ void updateEmployee(string empUsername[], string empPwd[], string empName[], str
 void viewEmployee(string empUsername[], string empPwd[], string empName[], string empFname[], string empCellNo[], string empAddress[], string empCnic[], string empDOB[], string empGender[], bool isEmpExist[], int EmpSize, int &empCount);
 // delete employee
 void deleteEmployee(string empUsername[], string empPwd[], string empName[], string empFname[], string empCellNo[], string empAddress[], string empCnic[], string empDOB[], string empGender[], bool isEmpExist[], int EmpSize, int &empCount);
-
+//<------------------------profit report----------------------------------->
+void profitReport(int &tCost, int &tRevenue, int &tProfit, int &mobSold);
 //<----------------------inventry management------------------->
-// add inventry
-void addInventry(string mobileBrand[], string mobileModel[], string mobileSpecs[], string mobileSupplierName[], string mobileColor[], int mobileQty[], string mobileStorage[], int mobPurchasePrice[], int mobSalePrice[], int mobMinStockLevel[], double discount[], string status[], bool isMobileExist[], int MaxMobile, int &inventryChoice, int mobItemId[], int &mobileCount, // accessories
-                 string accessoryName[], string accessorySpecs[], string accessorySupplier[], int accessoryQuantity[], double accessoryPurchasePrice[], double accessorySalePrice[], int accessoryMinStock[], double accessoryDiscount[], string accessoryStatus[], bool isAccessoryExist[], int MaxAccessory, int &accessoryCount);
 // add mobiles
 void addMobiles(string mobileBrand[], string mobileModel[], string mobileSpecs[], string mobileSupplierName[], string mobileColor[], int mobileQty[], string mobileStorage[], int mobPurchasePrice[], int mobSalePrice[], int mobMinStockLevel[], double discount[], string status[], bool isMobileExist[], int MaxMobile, int mobItemId[], int &mobileCount);
-void addAccessories(string accessoryName[], string accessorySpecs[], string accessorySupplier[], int accessoryQuantity[], double accessoryPurchasePrice[], double accessorySalePrice[], int accessoryMinStock[], double accessoryDiscount[], string accessoryStatus[], bool isAccessoryExist[], int MaxAccessory, int &accessoryCount);
 void updateMobiles(string mobileBrand[], string mobileModel[], string mobileSpecs[], string mobileSupplierName[], string mobileColor[], int mobileQty[], string mobileStorage[], int mobPurchasePrice[], int mobSalePrice[], int mobMinStockLevel[], double discount[], string status[], bool isMobileExist[], int MaxMobile, int mobItemId[], int &mobileCount);
 void deleteMobiles(string mobileBrand[], string mobileModel[], string mobileSpecs[], string mobileSupplierName[], string mobileColor[], int mobileQty[], string mobileStorage[], int mobPurchasePrice[], int mobSalePrice[], int mobMinStockLevel[], double discount[], string status[], bool isMobileExist[], int MaxMobile, int mobItemId[], int &mobileCount);
 void viewMobiles(string mobileBrand[], string mobileModel[], string mobileSpecs[], string mobileSupplierName[], string mobileColor[], int mobileQty[], string mobileStorage[], int mobPurchasePrice[], int mobSalePrice[], int mobMinStockLevel[], double discount[], string status[], bool isMobileExist[], int MaxMobile, int mobItemId[], int &mobileCount, bool isAdmin); // here bool isAdmin determine wether to show full detailed list or ristricted (1 for admin, 0 for others)
-
+void lowStock(string mobileBrand[], string mobileModel[], string mobileSupplierName[], int mobileQty[], bool isMobileExist[], int MaxMobile, int mobItemId[], int &mobileCount, int mobMinStockLevel[]);
 //<-----------------------customer order management---------------------------------------->
 void cusOrderManagment(string mobileBrand[], string mobileModel[], string mobileColor[], int mobileQty[], string mobileStorage[], int mobPurchasePrice[], int mobSalePrice[], double discount[], string status[], bool isMobileExist[], int MaxMobile, int mobItemId[], int &mobileCount, int orderQty[][MaxOrder], int orders[][MaxOrder], int orderPrices[][MaxOrder], int orderCounts[], bool isOrderExist[][MaxOrder], string orderStatus[][MaxOrder], int MaxOrder, int CusSize, bool isCustomerExit[], string cusUsername[], string cusName[]);
-void managePendingOrders(string mobileBrand[], string mobileModel[], string mobileColor[], int mobileQty[], string mobileStorage[], int mobPurchasePrice[], int mobSalePrice[], double discount[], string status[], bool isMobileExist[], int MaxMobile, int mobItemId[], int &mobileCount, int mobProfit[], int orderQty[][MaxOrder], int orders[][MaxOrder], int orderPrices[][MaxOrder], int orderCounts[], bool isOrderExist[][MaxOrder], string orderStatus[][MaxOrder], int MaxOrder, int CusSize, bool isCustomerExit[], string cusUsername[], string cusName[], bool isProfitExist[]);
+void managePendingOrders(string mobileBrand[], string mobileModel[], string mobileColor[], int mobileQty[], string mobileStorage[], int mobPurchasePrice[], int mobSalePrice[], double discount[], string status[], bool isMobileExist[], int MaxMobile, int mobItemId[], int &mobileCount, int mobProfit[], int orderQty[][MaxOrder], int orders[][MaxOrder], int orderPrices[][MaxOrder], int orderCounts[], bool isOrderExist[][MaxOrder], string orderStatus[][MaxOrder], int MaxOrder, int CusSize, bool isCustomerExit[], string cusUsername[], string cusName[], bool isProfitExist[], int totalRevenue[], int totalCost[], int &tCost, int &tRevenue, int &tProfit, int &mobSold);
 //<------------------Customer profiles-------------------------->
 void addCustomer(string cusUsername[], string cusPwd[], string cusName[], string cusCell[], string cusAddress[], string cusDOB[], string cusGender[], bool isCustomerExit[], int CusSize, int &customerCount);
 void viewAllCustomer(string cusUsername[], string cusPwd[], string cusName[], string cusCell[], string cusAddress[], string cusDOB[], string cusGender[], bool isCustomerExit[], int CusSize, int &customerCount);
@@ -104,9 +107,10 @@ void loadCustomerData(string cusUsername[], string cusPwd[], string cusName[], s
 //<-------------------------------inventry data save & load--------------------------------->
 void saveInventryData(string mobileBrand[], string mobileModel[], string mobileSpecs[], string mobileSupplierName[], string mobileColor[], int mobileQty[], string mobileStorage[], int mobPurchasePrice[], int mobSalePrice[], int mobMinStockLevel[], double discount[], string status[], bool isMobileExist[], int MaxMobile, int mobItemId[], int &mobileCount);
 void loadInventryData(string mobileBrand[], string mobileModel[], string mobileSpecs[], string mobileSupplierName[], string mobileColor[], int mobileQty[], string mobileStorage[], int mobPurchasePrice[], int mobSalePrice[], int mobMinStockLevel[], double discount[], string status[], bool isMobileExist[], int MaxMobile, int mobItemId[], int &mobileCount);
+//<----------------------------profit save data---------------------------------->
+void saveProfitReport(int &tCost, int &tRevenue, int &tProfit, int &mobSold);
+void loadProfitReport(int &tCost, int &tRevenue, int &tProfit, int &mobSold);
 //<-------------------------------order data save & load--------------------------------->
-// void savePendingOrders(string cusName[], string cusUsername[], bool isCustomerExit[], int orders[][10], string mobileBrand[], string mobileModel[], string mobileStorage[], string mobileColor[], double mobSalePrice[], int orderQty[][10], int mobItemId[], string orderStatus[][10], bool isOrderExist[][10], int MaxOrder, int MaxMobile, int CusSize);
-
 void saveOrders(bool isCustomerExit[], int orders[][10], int orderQty[][10], string orderStatus[][10], bool isOrderExist[][10], int MaxOrder, int CusSize, string typeofSave, string fileName);
 void loadOrders(bool isCustomerExit[], int orders[][10], int orderQty[][10], string orderStatus[][10], bool isOrderExist[][10], int MaxOrder, int CusSize, int orderCounts[], string typeofSave, string fileName);
 int main()
@@ -123,9 +127,6 @@ int main()
     int managerChoice = -1;
 
     //<------------employee attributes------------------->
-    // string empPWD, empUsername;
-    // empUsername = "Emp";
-    // empPWD = "emp123";
     int employeeChoice = -1;
     string notification;
     const int EmpSize = 10; // max no. of employes size
@@ -140,7 +141,7 @@ int main()
     string empAddress[EmpSize]; // emp address
     string empCnic[EmpSize];    // emp cnic number
     string empDOB[EmpSize];     // emp date of birth
-    string empGender[EmpSize];    // emp gender
+    string empGender[EmpSize];  // emp gender
     // initilize arrays
     for (int i = 0; i < EmpSize; i++)
     {
@@ -182,9 +183,14 @@ int main()
     //<------------------inventry attributes------------------>
     int inventryChoice = -1;
     int mobileCount = 0;
-    int accessoryCount = 0;
     // mobiles
+    int tCost = 0;
+    int tRevenue = 0;
+    int tProfit = 0;
+    int mobSold = 0;
     const int MaxMobile = 30; // max no. of items
+    int totalRevenue[MaxMobile];
+    int totalCost[MaxMobile];
     int mobProfit[MaxMobile];
     bool isProfitExist[MaxMobile];
     int mobItemId[MaxMobile];
@@ -201,22 +207,13 @@ int main()
     double discount[MaxMobile];
     string status[MaxMobile];      // use to update status if mobile is out of stock
     bool isMobileExist[MaxMobile]; // check the variable is there exist any mobile
-    // Accessories
-    const int MaxAccessory = 30; // Maximum number of accessories
-    string accessoryName[MaxAccessory];
-    string accessorySpecs[MaxAccessory];
-    string accessorySupplier[MaxAccessory];
-    int accessoryQuantity[MaxAccessory];
-    double accessoryPurchasePrice[MaxAccessory];
-    double accessorySalePrice[MaxAccessory];
-    int accessoryMinStock[MaxAccessory];
-    double accessoryDiscount[MaxAccessory];
-    string accessoryStatus[MaxAccessory];
-    bool isAccessoryExist[MaxAccessory]; // check the variable is there exist any accessory
+
     for (int i = 0; i < MaxMobile; i++)
     {
-        mobItemId[i] = -1;
+        totalRevenue[i] = 0;
+        totalCost[i] = 0;
         mobProfit[i] = 0;
+        mobItemId[i] = -1;
         mobileBrand[i] = "nv";
         mobileModel[i] = "nv";
         mobileSpecs[i] = "nv";
@@ -267,7 +264,7 @@ int main()
     saveOrders(isCustomerExit, orders, orderQty, orderStatus, isOrderExist, MaxOrder, CusSize, "qty", "orderStatus.txt");
     saveOrders(isCustomerExit, orders, orderQty, orderStatus, isOrderExist, MaxOrder, CusSize, "order", "orderStatus.txt");
     loadOrders(isCustomerExit, orders, orderQty, orderStatus, isOrderExist, MaxOrder, CusSize, orderCounts, "", "orderId.txt");
-
+    loadProfitReport(tCost, tRevenue, tProfit, mobSold);
     do
     {
         mainInterface();
@@ -279,6 +276,7 @@ int main()
         case 1:
         {
             managerLoginHeader();
+            ;
             setTextColor(14); // yellow
             cout << " Enter Username: ";
             setTextColor(11); // aqua
@@ -427,9 +425,6 @@ int main()
                         {
                         case 1:
                         { // add inventry
-                            // addInventry(mobileBrand,mobileModel,mobileSpecs,mobileSupplierName,mobileColor,mobileQty,mobileStorage,mobPurchasePrice,mobSalePrice, mobMinStockLevel,discount,status,isMobileExist,MaxMobile,inventryChoice,mobileCount,
-                            // accessoryName,accessorySpecs,accessorySupplier,accessoryQuantity,accessoryPurchasePrice,accessorySalePrice,accessoryMinStock,accessoryDiscount,accessoryStatus,isAccessoryExist, MaxAccessory,accessoryCount);
-
                             addMobiles(mobileBrand, mobileModel, mobileSpecs, mobileSupplierName, mobileColor, mobileQty, mobileStorage, mobPurchasePrice, mobSalePrice, mobMinStockLevel, discount, status, isMobileExist, MaxMobile, mobItemId, mobileCount);
                             break;
                         }
@@ -520,11 +515,16 @@ int main()
                             break;
                         }
                         case 2:
+                        { // add customer
+                            addCustomer(cusUsername, cusPwd, cusName, cusCell, cusAddress, cusDOB, cusGender, isCustomerExit, CusSize, customerCount);
+                            break;
+                        }
+                        case 3:
                         { // update customer data
                             updateCustomer(cusUsername, cusPwd, cusName, cusCell, cusAddress, cusDOB, cusGender, isCustomerExit, CusSize, customerCount);
                             break;
                         }
-                        case 3:
+                        case 4:
                         { // delete customer
                             deleteCustomer(cusUsername, cusPwd, cusName, cusCell, cusAddress, cusDOB, cusGender, isCustomerExit, CusSize, customerCount);
                             break;
@@ -545,14 +545,19 @@ int main()
                 }
                 case 4:
                 { // order management
-                    managePendingOrders(mobileBrand, mobileModel, mobileColor, mobileQty, mobileStorage, mobPurchasePrice, mobSalePrice, discount, status, isMobileExist, MaxMobile, mobItemId, mobileCount, mobProfit, orderQty, orders, orderPrices, orderCounts, isOrderExist, orderStatus, MaxOrder, CusSize, isCustomerExit, cusUsername, cusName, isProfitExist);
+                    managePendingOrders(mobileBrand, mobileModel, mobileColor, mobileQty, mobileStorage, mobPurchasePrice, mobSalePrice, discount, status, isMobileExist, MaxMobile, mobItemId, mobileCount, mobProfit, orderQty, orders, orderPrices, orderCounts, isOrderExist, orderStatus, MaxOrder, CusSize, isCustomerExit, cusUsername, cusName, isProfitExist, totalRevenue, totalCost, tCost, tRevenue, tProfit, mobSold);
                     break;
                 }
-                // case 5:
-                // {
-                //     // code
-                //     break;
-                // }
+                case 5:
+                { // low stock alert
+                    lowStock(mobileBrand, mobileModel, mobileSupplierName, mobileQty, isMobileExist, MaxMobile, mobItemId, mobileCount, mobMinStockLevel);
+                    break;
+                }
+                case 6:
+                { // profit report
+                    profitReport(tCost, tRevenue, tProfit, mobSold);
+                    break;
+                }
                 case 0:
                 {
                     loggedInUserType = -1;
@@ -585,9 +590,6 @@ int main()
                         {
                         case 1:
                         { // add items
-                            // addInventry(mobileBrand,mobileModel,mobileSpecs,mobileSupplierName,mobileColor,mobileQty,mobileStorage,mobPurchasePrice,mobSalePrice, mobMinStockLevel,discount,status,isMobileExist,MaxMobile,inventryChoice,mobileCount,
-                            // accessoryName,accessorySpecs,accessorySupplier,accessoryQuantity,accessoryPurchasePrice,accessorySalePrice,accessoryMinStock,accessoryDiscount,accessoryStatus,isAccessoryExist, MaxAccessory,accessoryCount);
-
                             addMobiles(mobileBrand, mobileModel, mobileSpecs, mobileSupplierName, mobileColor, mobileQty, mobileStorage, mobPurchasePrice, mobSalePrice, mobMinStockLevel, discount, status, isMobileExist, MaxMobile, mobItemId, mobileCount);
                             break;
                         }
@@ -649,7 +651,12 @@ int main()
                 }
                 case 3:
                 {
-                    managePendingOrders(mobileBrand, mobileModel, mobileColor, mobileQty, mobileStorage, mobPurchasePrice, mobSalePrice, discount, status, isMobileExist, MaxMobile, mobItemId, mobileCount, mobProfit, orderQty, orders, orderPrices, orderCounts, isOrderExist, orderStatus, MaxOrder, CusSize, isCustomerExit, cusUsername, cusName, isProfitExist);
+                    managePendingOrders(mobileBrand, mobileModel, mobileColor, mobileQty, mobileStorage, mobPurchasePrice, mobSalePrice, discount, status, isMobileExist, MaxMobile, mobItemId, mobileCount, mobProfit, orderQty, orders, orderPrices, orderCounts, isOrderExist, orderStatus, MaxOrder, CusSize, isCustomerExit, cusUsername, cusName, isProfitExist, totalRevenue, totalCost, tCost, tRevenue, tProfit, mobSold);
+                    break;
+                }
+                case 4:
+                { // low stock alert
+                    lowStock(mobileBrand, mobileModel, mobileSupplierName, mobileQty, isMobileExist, MaxMobile, mobItemId, mobileCount, mobMinStockLevel);
                     break;
                 }
                 case 0:
@@ -759,28 +766,52 @@ int main()
 
 //<-------------------------------Functionalities functions & validations---------------------------------->
 // this chacks whether input from 0 to 9
-int getValidDigitInput()
-{
-    int input = -1; // that will return the final correct input
-    char choice[10];
-    bool isDigit = false;
-    do
-    {
+// int getValidDigitInput()
+// {
+//     int input = -1; // that will return the final correct input
+//     char choice[10];
+//     bool isDigit = false;
+//     do
+//     {
+//         setTextColor(14);
+//         cout << "\t\t\t\t\t\t\t\tSelect desired option: ";
+//         setTextColor(15);
+//         cin >> choice;
+//         cin.ignore(100, '\n');
+//         if ((choice[0] >= '0' && choice[0] <= '9') && choice[1] == '\0')
+//         {
+//             input = atoi(choice);
+//             return input;
+//         }
+//         else
+//             return input;
+//         // that will return wrong input that detected by above used switch satement and shows error
+//         // after this again asked for input untill correct input
+//     } while (!isDigit);
+// }
+
+int getValidDigitInput() {
+    int input = -1; 
+    bool isValid = false; 
+    do {
         setTextColor(14);
         cout << "\t\t\t\t\t\t\t\tSelect desired option: ";
         setTextColor(15);
-        cin >> choice;
-        cin.ignore(100, '\n');
-        if ((choice[0] >= '0' && choice[0] <= '9') && choice[1] == '\0')
-        {
-            input = atoi(choice);
-            return input;
+        cin >> input;  
+
+        // Check if the input is within the valid range (0-9)
+        if (cin.fail()) {
+            cin.clear();  
+            cin.ignore(1000, '\n'); 
+            setTextColor(12);
+            cout<<"\t\t\t\t\t\t\t\tInvalid Choice!\n";
+        } else {
+            isValid = true;  
         }
-        else
-            return input;
-        // that will return wrong input that detected by above used switch satement and shows error
-        // after this again asked for input untill correct input
-    } while (!isDigit);
+
+    } while (!isValid); 
+
+    return input; 
 }
 
 // convert to int to manuplate dob
@@ -949,7 +980,7 @@ string validPhoneNo()
         }
 
         // If any condition fails, print error and prompt again
-        cout << "Incorrect cell number!\nPlease enter a valid 11-digit number : ";
+        cout << "Incorrect phone number!\nPlease enter a valid 11-digit phone number : ";
     }
 }
 
@@ -1010,19 +1041,26 @@ string validCNIC()
 // valid name
 string validName()
 {
-    char name[25];
+    char name[250]; //large size for monkey tests
     while (true)
     {
-        cin.getline(name, 25); // Read with spaces
+        cin.getline(name, 250); // Read with spaces
 
         int len = LengthOf(name);
         bool isValid = true;
 
         // Check valid length
-        if (len < 2 || len > 25)
+        if (len < 3 || len > 25)
         {
             isValid = false;
         }
+
+        // check 3rd char of name is not space
+        if (name[2] == ' ')
+        {
+            isValid = false;
+        }
+
         // Check if the name contains only alphabets and spaces
         for (int i = 0; i < len; i++)
         {
@@ -1060,60 +1098,73 @@ string validName()
     }
 }
 
-//valid address
-string validAddress() {
-    char address[100];  
+// valid address
+string validAddress()
+{
+    char address[300];
 
-    while (true) {
-        cin.getline(address, 101);  // Read address including spaces
+    while (true)
+    {
+        cin.getline(address, 300); // Read address including spaces
 
         int len = LengthOf(address);
         bool isValid = true;
 
         // Check length constraints
-        if (len < 4 || len > 100) {
+        if (len < 4 || len > 100)
+        {
             isValid = false;
         }
 
         // Check if address contain only valid chars
-        for (int i = 0; i < len; i++) {
-            if (!((address[i] >= 'A' && address[i] <= 'Z') ||   
-                  (address[i] >= 'a' && address[i] <= 'z') ||   
-                  (address[i] >= '0' && address[i] <= '9') ||  
-                  address[i] == ' ' || address[i] == ',' ||                         
-                  address[i] == '.' ||                         
-                  address[i] == '/' ||                         
-                  address[i] == '-' ||                          
-                  address[i] == '#')) {                         
+        for (int i = 0; i < len; i++)
+        {
+            if (!((address[i] >= 'A' && address[i] <= 'Z') ||
+                  (address[i] >= 'a' && address[i] <= 'z') ||
+                  (address[i] >= '0' && address[i] <= '9') ||
+                  address[i] == ' ' || address[i] == ',' ||
+                  address[i] == '.' ||
+                  address[i] == '/' ||
+                  address[i] == '-' ||
+                  address[i] == '#'))
+            {
                 isValid = false;
                 break;
             }
         }
 
-        //can't start or end with space
-        if (address[0] == ' ' || address[len - 1] == ' ') {
+        // can't start or end with space
+        if (address[0] == ' ' || address[len - 1] == ' ')
+        {
             isValid = false;
         }
 
         // no two spaces consectively
-        for (int i = 0; i < len - 1; i++) {
-            if (address[i] == ' ' && address[i + 1] == ' ') {
+        for (int i = 0; i < len - 1; i++)
+        {
+            if (address[i] == ' ' && address[i + 1] == ' ')
+            {
                 isValid = false;
                 break;
             }
         }
-        if (isValid) {
-            return string(address); 
-        } else {
+        if (isValid)
+        {
+            return string(address);
+        }
+        else
+        {
             cout << "Invalid address! Please enter again : ";
         }
     }
 }
 
-string validUsername() {
-    char username[16];  // Max length of username is 15 characters + null terminator
+string validUsername()
+{
+    char username[200]; // Max length of username is 15 characters + null terminator
 
-    while (true) {
+    while (true)
+    {
 
         cin >> username;
 
@@ -1121,83 +1172,279 @@ string validUsername() {
         bool isValid = true;
 
         // Check length
-        if (len < 3 || len > 15) {
+        if (len < 3 || len > 15)
+        {
             isValid = false;
         }
-        //check if both not exist at start
+        // check if both not exist at start
         if (!(username[0] >= 'A' && username[0] <= 'Z') &&
-            !(username[0] >= 'a' && username[0] <= 'z')) {
+            !(username[0] >= 'a' && username[0] <= 'z'))
+        {
             isValid = false;
         }
-        //check valid chars
-        for (int i = 0; i < len; i++) {
-            if (!((username[i] >= 'A' && username[i] <= 'Z') ||  
-                  (username[i] >= 'a' && username[i] <= 'z') || 
-                  (username[i] >= '0' && username[i] <= '9') ||  
-                  username[i] == '_')) {                       
+        // check valid chars
+        for (int i = 0; i < len; i++)
+        {
+            if (!((username[i] >= 'A' && username[i] <= 'Z') ||
+                  (username[i] >= 'a' && username[i] <= 'z') ||
+                  (username[i] >= '0' && username[i] <= '9') ||
+                  username[i] == '_'))
+            {
                 isValid = false;
                 break;
             }
 
-            
             if ((i > 0 && username[i] == '_' && username[i - 1] == '_') ||
-                (i == len - 1 && username[i] == '_')) { //check last char not be underscore
+                (i == len - 1 && username[i] == '_'))
+            { // check last char not be underscore
+                isValid = false;
+                break;
+            }
+        }
+
+        if (isValid)
+        {
+            return string(username);
+        }
+        else
+        {
+            cout << "Invalid username! Please try again.\n";
+        }
+    }
+}
+
+string validPwd()
+{
+    string pwd;
+
+    while (true)
+    {
+        getline(cin, pwd); // used to check if user enter space which is invalid
+        bool containSpaces = false;
+        for (int i = 0; i < LengthOf(pwd); i++)
+        {
+            if (pwd[i] == ' ')
+            {
+                containSpaces = true; // found space
+                break;
+            }
+        }
+        if (containSpaces)
+        {
+            cout << "Password can't contain spaces! Enter valid Password: ";
+            continue; // ask again untill enter correct
+        }
+        else
+        {
+            return pwd;
+        }
+    }
+}
+
+// valid gender
+string validGender()
+{
+    string gender;
+    while (true)
+    {
+        cin >> gender;
+        // convert to lower case
+        gender = toLowerCase(gender);
+        if (gender == "male" || gender == "female" || gender == "other")
+        {
+
+            return gender;
+        }
+        else
+        {
+            cout << "Invalid gender! please enter correct gender (male, female, other) : ";
+        }
+    }
+}
+//<----------------------------------mobile validations-------------------------------------->
+string validModelName()
+{
+    char modelName[100];
+    while (true)
+    {
+        cin.getline(modelName, 100); //read with spaces
+
+        int len = LengthOf(modelName);
+        bool isValid = true;
+
+        // Check valid length 2 to 25 
+        if (len < 2 || len > 25)
+        {
+            isValid = false;
+        }
+
+        // Check only contain alphabet, digit, and spaces....
+        for (int i = 0; i < len; i++)
+        {
+            if (!((modelName[i] >= 'A' && modelName[i] <= 'Z') || 
+                  (modelName[i] >= 'a' && modelName[i] <= 'z') || 
+                  (modelName[i] >= '0' && modelName[i] <= '9') || 
+                   modelName[i] == ' '))
+            {
+                isValid = false;
+                break;
+            }
+        }
+
+        // Check if name start or ends with a space
+        if (modelName[0] == ' ' || modelName[len - 1] == ' ')
+        {
+            isValid = false;
+        }
+
+        // Check for multiple consecutive spaces
+        for (int i = 0; i < len - 1; i++)
+        {
+            if (modelName[i] == ' ' && modelName[i + 1] == ' ')
+            {
+                isValid = false;
+                break;
+            }
+        }
+
+        if (isValid)
+        {
+            return string(modelName); // Return valid model name
+        }
+        else
+        {
+            cout << "Invalid model name! Please enter a valid model name:\n";
+        }
+    }
+}
+
+string validStorage() {
+    char storage[500];   //large size so array hold large 
+    int storageValue = 0;  //for int type manuplation to check right storage
+    bool isValid = false;
+    bool isTB = false; 
+
+    while (!isValid) {
+        
+        cin.getline(storage, 500); 
+
+        int length = LengthOf(storage);
+        isValid = true; //valid until proved invalid
+
+        // Check if gb or tb at last
+        if (length >= 2 &&
+            ((storage[length - 2] == 'G' || storage[length - 2] == 'g') &&
+             (storage[length - 1] == 'B' || storage[length - 1] == 'b'))) {
+            length -= 2;  // Ignore last 2 bcz to check int value that left 
+        } else if (length >= 2 &&
+                   ((storage[length - 2] == 'T' || storage[length - 2] == 't') &&
+                    (storage[length - 1] == 'B' || storage[length - 1] == 'b'))) {
+            length -= 2;  // Ignore the last 2 validate tb
+            isTB = true;  
+        } else {
+            isValid = false; 
+        }
+
+        // Check if remaining input  numeric
+        storageValue = 0;  // Reset storageValue before start..
+        for (int i = 0; i < length; i++) {
+            if (storage[i] < '0' || storage[i] > '9') { 
+                isValid = false;
+                break;
+            }
+            storageValue = storageValue * 10 + (storage[i] - '0');  // Convert char to int
+        }
+
+        // Convert TB to GB to check valid range
+        if (isTB) {
+            storageValue *= 1024; //now in GB is
+        }
+
+        // Check valid range (1 GB to 2048 gb)
+        if (isValid && (storageValue < 1 || storageValue > 2048)) {
+            isValid = false;
+        }
+
+        // If the input is valid then return
+        if (isValid) {
+            string result = intToString(storageValue);
+            if (isTB) {
+                result += " TB";
+            } else {
+                result += " GB";
+            }
+            return result; 
+        } else {
+            cout << "Invalid storage! Enter a valid storage capacity (1 GB to 2048 GB or 1 TB): ";
+            storageValue = 0;  // Reset for next iteration
+            isTB = false;      
+        }
+    }
+    return "";  // This should never be reached
+}
+
+string validSpecs() {
+    string specs;
+    while (true) {
+        
+        getline(cin, specs);  
+
+        bool isValid = true;
+        int len = LengthOf(specs);
+
+        if (len < 4 || len > 200) {
+            isValid = false;
+        }
+
+        // Check if contain only valid characters (. + - )
+        for (int i = 0; i < len; i++) {
+            if (!(isalnum(specs[i]) || specs[i] == ' '  || specs[i] == '-' || specs[i] == '.' || specs[i] == '+')) {
+                isValid = false;
+                break;
+            }
+        }
+
+        // Check if snot empty or last char not space
+        if (len == 0 || specs[0] == ' ' ||  specs[len - 1] == ' ') {
+            isValid = false;
+        }
+
+        // If specs contain multiple consecutive spaces, mark as invalid
+        for (int i = 0; i < len - 1; i++) {
+            if (specs[i] == ' ' && specs[i + 1] == ' ') {
                 isValid = false;
                 break;
             }
         }
 
         if (isValid) {
-            return string(username);
+            return specs;
         } else {
-            cout << "Invalid username! Please try again.\n";
+            cout << "Invalid specs! Please enter valid mobile specifications:";
         }
     }
 }
 
-string validPwd(){
-    string pwd;
-   
-    while (true)
-    {
-        getline(cin,pwd); //used to check if user enter space which is invalid
-        bool containSpaces = false;
-        for(int i=0; i<LengthOf(pwd); i++){
-            if(pwd[i]==' '){
-                containSpaces = true; //found space
-                break;
-            }
+int validIntInput(const string& fieldName, int minValue, int maxValue) {
+    int num;
+    while (true) {
+
+        cin >> num;
+        // Check if the input is a valid integer
+        if (cin.fail()) {
+            cin.clear();  
+            cin.ignore(1000, '\n'); 
+            cout << "Error! Please enter a valid integer for " << fieldName << ": ";
         }
-        if(containSpaces){
-            cout<<"Password can't contain spaces! Enter valid Password: ";
-            continue; //ask again untill enter correct 
+        else if (num >= minValue && num <= maxValue) {
+            return num;  
         }
-        else{
-            return pwd;
+        else {
+            // If the number is out of range, ask the user to enter again
+            cout << "Invalid number! "<<fieldName<<" must be between " << minValue << " and " << maxValue << ". Please try again: ";
         }
     }
-    
 }
-
-//valid gender
-string validGender(){
-    string gender;
-    while (true)
-    {
-        cin>>gender;
-        //convert to lower case
-        gender = toLowerCase(gender);
-        if(gender == "male" || gender == "female" || gender == "other" ){
-            
-            return gender;
-        }
-        else{
-            cout<<"Invalid gender! please enter correct gender (male, female, other) : ";
-        }
-    }
-    
-}
-
 //<-----------------------------------smart functions------------------------------------->
 int LengthOf(const string &str)
 {
@@ -1210,14 +1457,15 @@ int LengthOf(const string &str)
 
     return length;
 }
-//convert string to lower case
-string toLowerCase(string str){
-    for(int i=0; i<LengthOf(str); i++){
-            if(str[i]>='A' && str[i]<='Z')
-                str[i] = str[i] + 32;
-        }
+// convert string to lower case
+string toLowerCase(string str)
+{
+    for (int i = 0; i < LengthOf(str); i++)
+    {
+        if (str[i] >= 'A' && str[i] <= 'Z')
+            str[i] = str[i] + 32;
+    }
     return str;
-
 }
 
 string tokenizer(string str, int field)
@@ -1234,6 +1482,32 @@ string tokenizer(string str, int field)
             break;
     }
     return res;
+}
+string intToString(int number) {
+    string result = ""; 
+    // Check if the number is zero
+    if (number == 0) {
+        result = "0";  
+        return result;
+    }
+
+    bool isNegative = false;  
+    if (number < 0) {
+        isNegative = true;  
+        number = -number;  
+    }
+
+    while (number > 0) {
+        char digit = (number % 10) + '0';  // Get last digit & convert to char
+        result = digit + result;
+        number /= 10;  // Remove the last digit
+    }
+
+    if (isNegative) {
+        result = "-" + result;
+    }
+
+    return result;  // Return the final string
 }
 
 int stringToInt(string str)
@@ -1330,7 +1604,7 @@ void updateEmployee(string empUsername[], string empPwd[], string empName[], str
     if (empCount != 0)
     {
         cout << " Enter username of employee : ";
-        cin >> username;
+        username = validUsername();
         for (int i = 0; i < EmpSize; i++)
         {
             if (username == empUsername[i])
@@ -1353,7 +1627,7 @@ void updateEmployee(string empUsername[], string empPwd[], string empName[], str
                 cout << "Enter employee date of birth (DD-MM-YYYY): ";
                 empDOB[i] = validDate();
                 cout << "Enter gender (M for male or F for Female): ";
-                cin >> empGender[i];
+                empGender[i] = validGender();
                 isUserFound = true;
                 setTextColor(10); // green
                 cout << "\n\t\t\t\t\t\t\t\tEmployee data updated successfully......." << endl;
@@ -1390,7 +1664,7 @@ void deleteEmployee(string empUsername[], string empPwd[], string empName[], str
     if (empCount != 0)
     {
         cout << " Enter username of employee : ";
-        cin >> username;
+        username = validUsername();
         for (int i = 0; i < EmpSize; i++)
         {
             if (username == empUsername[i])
@@ -1496,25 +1770,25 @@ void addMobiles(string mobileBrand[], string mobileModel[], string mobileSpecs[]
             if (!isMobileExist[i])
             {
                 cout << "Enter mobile Brand : ";
-                mobileBrand[i] = correctDataEntry();
+                mobileBrand[i] = validName();
                 cout << "Enter model: ";
-                mobileModel[i] = correctDataEntry();
-                cout << "Enter storage: ";
-                mobileStorage[i] = correctDataEntry();
+                mobileModel[i] = validModelName();
+                cout << "Enter storage in (GB or TB): ";
+                mobileStorage[i] = validStorage();
                 cout << "Enter specs: ";
-                mobileSpecs[i] = correctDataEntry();
+                mobileSpecs[i] = validSpecs();
                 cout << "Enter mobile color: ";
-                mobileColor[i] = correctDataEntry();
+                mobileColor[i] = validName();
                 cout << "Enter supplier name: ";
-                mobileSupplierName[i] = correctDataEntry();
+                mobileSupplierName[i] = validName();
                 cout << "Enter quantity: ";
-                cin >> mobileQty[i];
+                mobileQty[i] = validIntInput("Quantity", 1, 1000);
                 cout << "Enter purchase Price: ";
-                cin >> mobPurchasePrice[i];
+                mobPurchasePrice[i]  = validIntInput("Purchase Price", 1, 1000000);
                 cout << "Enter sale Price: ";
-                cin >> mobSalePrice[i];
+                mobSalePrice[i] = validIntInput("Sale Price", 1, 1000000);
                 cout << "Enter minimum Stock Level: ";
-                cin >> mobMinStockLevel[i];
+                mobMinStockLevel[i] = validIntInput("Minimum Stock Level", 1, 500);
                 mobileCount++;
                 mobItemId[i] = i + 1;
                 isMobileExist[i] = true;
@@ -1534,108 +1808,6 @@ void addMobiles(string mobileBrand[], string mobileModel[], string mobileSpecs[]
         cin.get();
     }
 }
-// add accessories
-void addAccessories(string accessoryName[], string accessorySpecs[], string accessorySupplier[], int accessoryQuantity[], double accessoryPurchasePrice[], double accessorySalePrice[], int accessoryMinStock[], double accessoryDiscount[], string accessoryStatus[], bool isAccessoryExist[], int MaxAccessory, int &accessoryCount)
-{
-    system("cls");
-    setTextColor(14);
-    cout << " ===================================" << endl;
-    setTextColor(11);
-    cout << "        --- Add Accessory ---       " << endl;
-    setTextColor(14);
-    cout << " ===================================" << endl
-         << endl;
-    if (accessoryCount <= MaxAccessory)
-    {
-        for (int i = 0; i < MaxAccessory; i++)
-        {
-            if (!isAccessoryExist[i])
-            {
-                cout << "Enter accessory name : ";
-                cin.ignore();
-                accessoryName[i] = correctDataEntry();
-                cin.ignore();
-                cout << "Enter accessory specs : ";
-                accessorySpecs[i] = correctDataEntry();
-                cout << "Enter supplier name: ";
-                accessorySupplier[i] = correctDataEntry();
-                cout << "Enter quantity: ";
-                cin >> accessoryQuantity[i];
-                cout << "Enter purchase Price: ";
-                cin >> accessoryPurchasePrice[i];
-                cout << "Enter sale Price: ";
-                cin >> accessorySalePrice[i];
-                cout << "Enter minimum Stock Level: ";
-                cin >> accessoryMinStock[i];
-                accessoryCount++;
-                isAccessoryExist[i] = true;
-                setTextColor(10); // green
-                cout << "\n\t\t\t\t\t\t\t\tMobile added successfully......." << endl;
-                cin.ignore();
-                cin.get();
-                break;
-            }
-        }
-    }
-    else
-    {
-        setTextColor(12); // red
-        cout << "\n\tMaximum number of accessory reached. Cannot add more accoessory!" << endl;
-        cin.get();
-    }
-}
-// add inventry
-void addInventry(string mobileBrand[], string mobileModel[], string mobileSpecs[], string mobileSupplierName[], string mobileColor[], int mobileQty[], string mobileStorage[], int mobPurchasePrice[], int mobSalePrice[], int mobMinStockLevel[], double discount[], string status[], bool isMobileExist[], int MaxMobile, int &inventryChoice, int mobItemId[], int &mobileCount, // accessories
-                 string accessoryName[], string accessorySpecs[], string accessorySupplier[], int accessoryQuantity[], double accessoryPurchasePrice[], double accessorySalePrice[], int accessoryMinStock[], double accessoryDiscount[], string accessoryStatus[], bool isAccessoryExist[], int MaxAccessory, int &accessoryCount)
-{
-    do
-    {
-        system("cls");
-        setTextColor(14);
-        cout << " ===================================" << endl;
-        setTextColor(11);
-        cout << "        --- Add Inventory ---       " << endl;
-        setTextColor(14);
-        cout << " ===================================" << endl;
-        setTextColor(14);
-        cout << " 1. ";
-        setTextColor(11);
-        cout << "Add Mobile" << endl;
-        setTextColor(14);
-        cout << " 2. ";
-        setTextColor(11);
-        cout << "Add Accessory" << endl;
-        setTextColor(14);
-        cout << " 0. ";
-        setTextColor(11);
-        cout << "Exit" << endl;
-        setTextColor(14);
-        cout << " ===================================" << endl;
-        inventryChoice = getValidDigitInput(); // assures valid input digit 0-9
-        switch (inventryChoice)
-        {
-        case 1:
-        { // add mobile
-            addMobiles(mobileBrand, mobileModel, mobileSpecs, mobileSupplierName, mobileColor, mobileQty, mobileStorage, mobPurchasePrice, mobSalePrice, mobMinStockLevel, discount, status, isMobileExist, MaxMobile, mobItemId, mobileCount);
-            break;
-        }
-        case 2:
-        { // add accessory
-            addAccessories(accessoryName, accessorySpecs, accessorySupplier, accessoryQuantity, accessoryPurchasePrice, accessorySalePrice, accessoryMinStock, accessoryDiscount, accessoryStatus, isAccessoryExist, MaxAccessory, accessoryCount);
-            break;
-        }
-        case 0:
-        {
-            break;
-        }
-        default:
-        {
-            invalidErrorMessage();
-        }
-        }
-    } while (inventryChoice != 0);
-    inventryChoice = -1;
-}
 
 // update mobiles
 void updateMobiles(string mobileBrand[], string mobileModel[], string mobileSpecs[], string mobileSupplierName[], string mobileColor[], int mobileQty[], string mobileStorage[], int mobPurchasePrice[], int mobSalePrice[], int mobMinStockLevel[], double discount[], string status[], bool isMobileExist[], int MaxMobile, int mobItemId[], int &mobileCount)
@@ -1653,31 +1825,31 @@ void updateMobiles(string mobileBrand[], string mobileModel[], string mobileSpec
         string searchMob;
         bool Found = false;
         cout << "Enter the mobile name : ";
-        searchMob = correctDataEntry();
+        searchMob = validModelName();
         for (int i = 0; i < MaxMobile; i++)
         {
             if (mobileModel[i] == searchMob)
             {
                 cout << "Enter mobile Brand : ";
-                mobileBrand[i] = correctDataEntry();
+                mobileBrand[i] = validName();
                 cout << "Enter model: ";
-                mobileModel[i] = correctDataEntry();
-                cout << "Enter storage: ";
-                mobileStorage[i] = correctDataEntry();
+                mobileModel[i] = validModelName();
+                cout << "Enter storage in (GB or TB): ";
+                mobileStorage[i] = validStorage();
                 cout << "Enter specs: ";
                 mobileSpecs[i] = correctDataEntry();
                 cout << "Enter mobile color: ";
-                mobileColor[i] = correctDataEntry();
+                mobileColor[i] = validName();
                 cout << "Enter supplier name: ";
-                mobileSupplierName[i] = correctDataEntry();
+                mobileSupplierName[i] = validName();
                 cout << "Enter quantity: ";
-                cin >> mobileQty[i];
+                mobileQty[i] = validIntInput("Quantity", 1, 1000);
                 cout << "Enter purchase Price: ";
-                cin >> mobPurchasePrice[i];
+                mobPurchasePrice[i]  = validIntInput("Purchase Price", 1, 1000000);
                 cout << "Enter sale Price: ";
-                cin >> mobSalePrice[i];
+                mobSalePrice[i] = validIntInput("Sale Price", 1, 1000000);
                 cout << "Enter minimum Stock Level: ";
-                cin >> mobMinStockLevel[i];
+                mobMinStockLevel[i] = validIntInput("Minimum Stock Level", 1, 500);
                 Found = true;
                 setTextColor(10); // green
                 cout << "\n\t\t\t\t\t\t\t\tMobile updated successfully......." << endl;
@@ -1715,7 +1887,7 @@ void deleteMobiles(string mobileBrand[], string mobileModel[], string mobileSpec
         string searchMob;
         bool Found = false;
         cout << "Enter the mobile name : ";
-        searchMob = correctDataEntry();
+        searchMob = validModelName();
         for (int i = 0; i < MaxMobile; i++)
         {
             if (mobileModel[i] == searchMob)
@@ -1813,7 +1985,7 @@ void viewMobiles(string mobileBrand[], string mobileModel[], string mobileSpecs[
                     cout << setw(13) << mobSalePrice[i] << "| " << endl;
                 }
             }
-        } //-----------
+        }
         if (isAdmin)
         {
             cout << "\t ------------------------------------------------------------------------------------------------------------------------------------------------------------------" << endl;
@@ -1830,6 +2002,95 @@ void viewMobiles(string mobileBrand[], string mobileModel[], string mobileSpecs[
     }
     cin.get();
 }
+
+void lowStock(string mobileBrand[], string mobileModel[], string mobileSupplierName[], int mobileQty[], bool isMobileExist[], int MaxMobile, int mobItemId[], int &mobileCount, int mobMinStockLevel[])
+{
+    system("cls");
+    bool foundOrder = false;
+    cout << endl
+         << endl;
+    setTextColor(14);
+    cout << "\t\t\t\t\t\t===================================" << endl;
+    setTextColor(11);
+    cout << "\t\t\t\t\t\t     --- Low Stock Alert  ---      " << endl;
+    setTextColor(14);
+    cout << "\t\t\t\t\t\t===================================" << endl
+         << endl;
+    cout << left; 
+    setTextColor(11); 
+    cout << "\t\t\t ------------------------------------------------------------------------" << endl;
+    cout << "\t\t\t";
+    cout << setw(10) << " | Item Id" << setw(13) << " | Brand " << setw(20) << "| Model" << setw(18) << "| Supplier Name" << setw(11) << "| Qty" << "|" << endl;
+    cout << "\t\t\t ------------------------------------------------------------------------" << endl;
+    bool foundItems = false;
+    if (mobileCount != 0)
+    {
+        foundItems = true;
+        for (int i = 0; i < MaxMobile; i++)
+        {
+            if (isMobileExist[i] && mobileQty[i] < mobMinStockLevel[i])
+            {
+                setTextColor(7);  
+                cout << "\t\t\t";
+                cout << " | " << setw(7) << mobItemId[i] << "| "
+                     << setw(11) << mobileBrand[i] << "| "
+                     << setw(18) << mobileModel[i] << "| "
+                     << setw(16) << mobileSupplierName[i]<< "| ";
+                
+                setTextColor(12);  // Red for low quantity
+                cout << setw(9) << mobileQty[i] << "| " << endl;
+            }
+        }
+        setTextColor(11);
+        cout << "\t\t\t ------------------------------------------------------------------------" << endl;
+    }
+    else
+    {
+        setTextColor(12); 
+        cout << "\n\t\t\tNo mobile added yet!" << endl;
+    }
+    if (foundItems)
+    {
+        setTextColor(10); // Green 
+        cout << "\n\t\t\tAll items are sufficiently stocked!" << endl;
+    }
+    cin.get();
+}
+
+//<----------------------------profit report------------------------------------->
+void profitReport(int &tCost, int &tRevenue, int &tProfit, int &mobSold)
+{
+    system("cls");
+    bool foundOrder = false;
+    cout << endl
+         << endl;
+    setTextColor(14);
+    cout << "\t\t\t\t\t\t===================================" << endl;
+    setTextColor(11);
+    cout << "\t\t\t\t\t\t     --- Profit Report  ---      " << endl;
+    setTextColor(14);
+    cout << "\t\t\t\t\t\t===================================" << endl
+         << endl;
+    cout << left;
+    cout << left;
+    if (tProfit != 0 && tRevenue != 0 && tCost != 0)
+    {
+        setTextColor(10); // Light Green=
+        cout << setw(20) << "\t\t\t\t\t\tMobiles Sold" << ": " << setw(10) << mobSold << endl;
+        cout << setw(20) << "\t\t\t\t\t\tTotal Revenue" << ": " << setw(10) << tRevenue << endl;
+        cout << setw(20) << "\t\t\t\t\t\tTotal Cost" << ": " << setw(10) << tCost << endl;
+        cout << setw(20) << "\t\t\t\t\t\tTotal Profit" << ": " << setw(10) << tProfit << endl;
+        setTextColor(14);
+        cout << "\t\t\t\t\t\t===================================" << endl;
+    }
+    else
+    {
+        setTextColor(12); // Red
+        cout << "\nProfit report unavailable. No mobile phones have been sold so far!";
+    }
+    cin.get();
+}
+
 //<-----------------------customer order management------------------------------------->
 void cusOrderManagment(string mobileBrand[], string mobileModel[], string mobileColor[], int mobileQty[], string mobileStorage[], int mobPurchasePrice[], int mobSalePrice[], double discount[], string status[], bool isMobileExist[], int MaxMobile, int mobItemId[], int &mobileCount, int orderQty[][MaxOrder], int orders[][MaxOrder], int orderPrices[][MaxOrder], int orderCounts[], bool isOrderExist[][MaxOrder], string orderStatus[][MaxOrder], int MaxOrder, int CusSize, bool isCustomerExit[], string cusUsername[], string cusName[])
 {
@@ -1890,7 +2151,7 @@ void cusOrderManagment(string mobileBrand[], string mobileModel[], string mobile
     }
 }
 
-void managePendingOrders(string mobileBrand[], string mobileModel[], string mobileColor[], int mobileQty[], string mobileStorage[], int mobPurchasePrice[], int mobSalePrice[], double discount[], string status[], bool isMobileExist[], int MaxMobile, int mobItemId[], int &mobileCount, int mobProfit[], int orderQty[][MaxOrder], int orders[][MaxOrder], int orderPrices[][MaxOrder], int orderCounts[], bool isOrderExist[][MaxOrder], string orderStatus[][MaxOrder], int MaxOrder, int CusSize, bool isCustomerExit[], string cusUsername[], string cusName[], bool isProfitExist[])
+void managePendingOrders(string mobileBrand[], string mobileModel[], string mobileColor[], int mobileQty[], string mobileStorage[], int mobPurchasePrice[], int mobSalePrice[], double discount[], string status[], bool isMobileExist[], int MaxMobile, int mobItemId[], int &mobileCount, int mobProfit[], int orderQty[][MaxOrder], int orders[][MaxOrder], int orderPrices[][MaxOrder], int orderCounts[], bool isOrderExist[][MaxOrder], string orderStatus[][MaxOrder], int MaxOrder, int CusSize, bool isCustomerExit[], string cusUsername[], string cusName[], bool isProfitExist[], int totalRevenue[], int totalCost[], int &tCost, int &tRevenue, int &tProfit, int &mobSold)
 {
     int choice;
     int stChoice;
@@ -1920,15 +2181,16 @@ void managePendingOrders(string mobileBrand[], string mobileModel[], string mobi
         case 1:
         {
             cout << "Enter username of customer :";
-            cin >> username;
+            username = validUsername();
             cout << "Enter item id : ";
-            cin >> itemId;
+            itemId = validIntInput("Item Id",0,1000);
             cout << "Select new status:" << endl;
             cout << "1. Shipped" << endl;
             cout << "2. Delivered" << endl;
             cout << "3. Out of Stock" << endl;
             do
             {
+                stChoice = -1;
                 stChoice = getValidDigitInput();
                 switch (stChoice)
                 {
@@ -1953,7 +2215,7 @@ void managePendingOrders(string mobileBrand[], string mobileModel[], string mobi
                 }
                 }
             } while (stChoice != 1 && stChoice != 2 && stChoice != 3);
-            stChoice = -1;
+            // updating status
             for (int cus = 0; cus < CusSize; cus++) // customer rows
             {
                 if (username == cusUsername[cus])
@@ -1976,6 +2238,12 @@ void managePendingOrders(string mobileBrand[], string mobileModel[], string mobi
                                             mobileQty[k] -= orderQty[cus][cusField];
                                             mobProfit[k] = mobSalePrice[k] - mobPurchasePrice[k];
                                             isProfitExist[k] = true;
+                                            // total profit
+                                            tProfit += (mobSalePrice[k] - mobPurchasePrice[k]);
+                                            tRevenue += mobSalePrice[k];
+                                            tCost += mobPurchasePrice[k];
+                                            mobSold += orderQty[cus][cusField];
+                                            saveProfitReport(tCost, tRevenue, tProfit, mobSold);
                                         }
                                         isItemIdCorrect = true;
                                         setTextColor(10); // green
@@ -2039,6 +2307,7 @@ void addCustomer(string cusUsername[], string cusPwd[], string cusName[], string
                 cout << "Enter Username : ";
                 cusUsername[i] = validUsername();
                 cout << "Enter Password : ";
+                cin.ignore(100, '\n');
                 cusPwd[i] = validPwd();
                 cout << "Enter your name :";
                 cusName[i] = validName();
@@ -2047,8 +2316,9 @@ void addCustomer(string cusUsername[], string cusPwd[], string cusName[], string
                 cout << "Enter your date of birth : ";
                 cusDOB[i] = validDate();
                 cout << "Enter your gender : ";
-                cusGender[i] = correctDataEntry();
+                cusGender[i] = validGender();
                 cout << "Enter your Address : ";
+                cin.ignore(100, '\n');
                 cusAddress[i] = validAddress();
                 customerCount++;
                 isCustomerExit[i] = true;
@@ -2084,7 +2354,7 @@ void updateCustomer(string cusUsername[], string cusPwd[], string cusName[], str
         string username;
         bool isUserFound = false;
         cout << " Enter username of Customer : ";
-        cin >> username;
+        username = validUsername();
         for (int i = 0; i < CusSize; i++)
         {
             if (username == cusUsername[i])
@@ -2101,7 +2371,7 @@ void updateCustomer(string cusUsername[], string cusPwd[], string cusName[], str
                 cout << "Enter your date of birth : ";
                 cusDOB[i] = validDate();
                 cout << "Enter your gender : ";
-                cusGender[i] = correctDataEntry();
+                cusGender[i] = validGender();
                 cout << "Enter your Address : ";
                 cusAddress[i] = validAddress();
                 isUserFound = true;
@@ -2140,7 +2410,7 @@ void deleteCustomer(string cusUsername[], string cusPwd[], string cusName[], str
         string username;
         bool isUserFound = false;
         cout << " Enter username of Customer : ";
-        cin >> username;
+        username = validUsername();
         for (int i = 0; i < CusSize; i++)
         {
             if (username == cusUsername[i])
@@ -2266,9 +2536,9 @@ void placeOrder(string mobileBrand[], string mobileModel[], string mobileSpecs[]
                 if (!isOrderExist[cusIndex][i])
                 { // where to store item id for order (at i index) related to order
                     cout << "\tEnter item id of product you wanna buy : ";
-                    cin >> itemId;
+                    itemId = validIntInput("Item Id",0,1000);
                     cout << "\tEnter the quantity : ";
-                    cin >> qty;
+                    qty = validIntInput("Quantity", 1, 500);
                     for (int k = 0; k < MaxMobile; k++)
                     { /*search mobile for qty check all mobile details exist at k related to mobiles*/
                         if (mobItemId[k] == itemId)
@@ -2462,10 +2732,15 @@ void managerMainMenu()
     setTextColor(11);
     cout << "Order Management" << endl;
 
-    // setTextColor(14);
-    // cout << " 5. ";
-    // setTextColor(11);
-    // cout << "Profit Report" << endl;
+    setTextColor(14);
+    cout << " 5. ";
+    setTextColor(11);
+    cout << "Low Stock Alert" << endl;
+
+    setTextColor(14);
+    cout << " 6. ";
+    setTextColor(11);
+    cout << "Profit Report" << endl;
 
     setTextColor(14);
     cout << " 0. ";
@@ -2576,9 +2851,12 @@ void managerCustomerManagement()
     setTextColor(14);
     cout << " 2. ";
     setTextColor(11);
+    cout << "Add customer" << endl;
+    cout << " 3. ";
+    setTextColor(11);
     cout << "Update customer data" << endl;
     setTextColor(14);
-    cout << " 3. ";
+    cout << " 4. ";
     setTextColor(11);
     cout << "Delete Customer Account" << endl;
     setTextColor(14);
@@ -2625,6 +2903,10 @@ void employeeMainMenu()
     cout << " 3. ";
     setTextColor(11);
     cout << "Order Management" << endl;
+    setTextColor(14);
+    cout << " 4. ";
+    setTextColor(11);
+    cout << "Low Stock Alert" << endl;
     setTextColor(14);
     cout << " 0. ";
     setTextColor(11);
@@ -3130,4 +3412,38 @@ void loadOrders(bool isCustomerExit[], int orders[][10], int orderQty[][10], str
     }
 
     fin.close(); // Close the file
+}
+
+//<----------------------------profit save report----------------------------------->
+void saveProfitReport(int &tCost, int &tRevenue, int &tProfit, int &mobSold)
+{
+    ofstream fout;
+    fout.open("profit.txt"); // Open the file for writing
+    if (!fout)
+    {
+        cout << "Error: Could not open profit.txt for writing!" << endl;
+        return;
+    }
+    fout << mobSold << endl;
+    fout << tRevenue << endl;
+    fout << tCost << endl;
+    fout << tProfit << endl;
+
+    fout.close();
+}
+
+void loadProfitReport(int &tCost, int &tRevenue, int &tProfit, int &mobSold)
+{
+    ifstream fin;
+    fin.open("profit.txt");
+    if (!fin)
+    {
+        cout << "Error: Could not open profit.txt for reading!" << endl;
+    }
+    fin >> mobSold;
+    fin >> tRevenue;
+    fin >> tCost;
+    fin >> tProfit;
+
+    fin.close();
 }
