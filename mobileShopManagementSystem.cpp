@@ -38,17 +38,18 @@ void customerPortalHeader();
 void customerPortal();           // customer portal with options
 void customerProfileMenu();      // customer within profile options
 void customerWithoutLoginMenu(); ////customer without having a profile
-
+//<-------------------------------login checker--------------------------------->
+bool ManagerLoginChecker(string realUsername, string realPass);
+bool EmployeeloginChecker(string empUsername[], string empPwd[],int EmpSize);
 // other functionalities
 //<---------------employee and customer validations----------------------->
 void invalidErrorMessage();   // invalid option error
 int getValidDigitInput();     // make sure input is 0 - 9 single digit
-string correctDataEntry();    // ensures user enter b/w (A to Z) & 0 - 9
 string maskedInputPass();     // input masked password from user
 void setTextColor(int color); // changes the color of specific text
 string validDate();           // date validator
 string validPhoneNo();
-string validName();
+string validName(int minLen, int maxLen, string errorMsg);
 string validAddress();
 string validUsername();
 string validPwd(); // check user enter valid pwd at time of creating account
@@ -113,6 +114,7 @@ void loadProfitReport(int &tCost, int &tRevenue, int &tProfit, int &mobSold);
 //<-------------------------------order data save & load--------------------------------->
 void saveOrders(bool isCustomerExit[], int orders[][10], int orderQty[][10], string orderStatus[][10], bool isOrderExist[][10], int MaxOrder, int CusSize, string typeofSave, string fileName);
 void loadOrders(bool isCustomerExit[], int orders[][10], int orderQty[][10], string orderStatus[][10], bool isOrderExist[][10], int MaxOrder, int CusSize, int orderCounts[], string typeofSave, string fileName);
+
 int main()
 {
     //<--------------for authentication--------------->
@@ -274,25 +276,15 @@ int main()
         switch (choice)
         {
         case 1:
-        {
-            managerLoginHeader();
-            ;
-            setTextColor(14); // yellow
-            cout << " Enter Username: ";
-            setTextColor(11); // aqua
-            cin >> username;
-            cin.ignore(100, '\n');
-            setTextColor(14);
-            cout << " Enter Password: ";
-            setTextColor(11);
-            pwd = maskedInputPass(); // calls the function to take input and save in pwd
-            if (username == managerUsername && pwd == managerPWD)
+        {   //after getting correct premeter it checks whether credentials are correct or not
+            if(ManagerLoginChecker(managerUsername,managerPWD)) 
                 loggedInUserType = 1;
             else
             {
+                managerLoginHeader();
                 loggedInUserType = -1;
                 setTextColor(12);
-                cout << "Invalid Manager Credentials!\n";
+                cout << "\nInvalid Manager Credentials!\n";
                 setTextColor(8);
                 system("pause");
             }
@@ -301,29 +293,14 @@ int main()
         case 2:
         {
             employeeLoginHeader();
-            setTextColor(14);
-            cout << " Enter Username: ";
-            setTextColor(11);
-            cin >> username;
-            setTextColor(14);
-            cout << " Enter Password: ";
-            setTextColor(11);
-            isUserFound = false;
-            pwd = maskedInputPass(); // calls the function to take input and save in pwd
-            for (int i = 0; i < EmpSize; i++)
-            {
-                if (username == empUsername[i] && pwd == empPwd[i])
-                {
-                    loggedInUserType = 2;
-                    isUserFound = true;
-                    break;
-                }
-            }
-            if (!isUserFound)
-            { // if no user found
+            //it checks credentials if correct return true and move next
+            if(EmployeeloginChecker(empUsername,empPwd,EmpSize))
+                loggedInUserType = 2;
+            else{
+                 managerLoginHeader();
                 loggedInUserType = -1;
                 setTextColor(12);
-                cout << "Invalid Employee Credentials!\n";
+                cout << "\nInvalid Employee Credentials!\n";
                 setTextColor(8);
                 system("pause");
             }
@@ -763,33 +740,84 @@ int main()
 
     return 0;
 }
+//<---------------------------------------Manager Login checker------------------------------------>
+bool ManagerLoginChecker(string realUsername, string realPass){
+    string username, pass;
+    managerLoginHeader();
+    for (int j = 2; j >= 0; j--) {
+        // Prompt for username and password
+        setTextColor(14); // yellow
+        cout << " Enter Username: ";
+        setTextColor(11); // aqua
+        cin >> username;
+        cin.ignore(100, '\n');
+        setTextColor(14);
+        cout << " Enter Password: ";
+        setTextColor(11);
+        pass = maskedInputPass();
 
+        // Check if both username and password match
+        if (username == realUsername && pass == realPass) {
+            return true; // Successful login
+        } else {
+            setTextColor(12); // red
+            cout <<" "<< j << " tries left" << endl;
+        }
+        
+        // If no attempts are left, trigger cooldown
+        if (j == 0) {
+            for (int i = 9; i >= 1; i--) {
+                managerLoginHeader();
+                setTextColor(12); // red
+                cout << "\n Try again after seconds: 0" << i << endl;
+                Sleep(1000);
+                system("cls");
+            }
+            return false;
+        }
+    }
+    return false; // Return false if all attempts are used up
+}
+//<-------------------------employee login checker----------------------------------------------->
+bool EmployeeloginChecker(string empUsername[], string empPwd[],int EmpSize){
+    string username, pwd;
+    employeeLoginHeader();
+    for (int j = 2; j >= 0; j--) {
+        setTextColor(14);
+        cout << " Enter Username: ";
+        setTextColor(11);
+        cin >> username;
+        setTextColor(14);
+        cout << " Enter Password: ";
+        setTextColor(11);
+        pwd = maskedInputPass();
+        // Check if both username and password match
+        for (int i = 0; i < EmpSize; i++){
+            if (username == empUsername[i] && pwd == empPwd[i])
+            {
+                return true; 
+                break; //LOOP break and tells that employee is authorized
+            }
+        }
+        //if this not happened then these statement will execute
+        setTextColor(12);
+        cout <<" "<< j << " tries left" << endl;
+        // If no attempts are left, trigger cooldown
+        if (j == 0) {
+            for (int i = 9; i >= 1; i--) {
+                employeeLoginHeader();
+                setTextColor(12); //red
+                cout << "\n Try again after seconds: 0" << i << endl;
+                Sleep(1000);
+                system("cls");
+            }
+            return false;
+        }
+    }
+    return false; 
+}
 //<-------------------------------Functionalities functions & validations---------------------------------->
 // this chacks whether input from 0 to 9
-// int getValidDigitInput()
-// {
-//     int input = -1; // that will return the final correct input
-//     char choice[10];
-//     bool isDigit = false;
-//     do
-//     {
-//         setTextColor(14);
-//         cout << "\t\t\t\t\t\t\t\tSelect desired option: ";
-//         setTextColor(15);
-//         cin >> choice;
-//         cin.ignore(100, '\n');
-//         if ((choice[0] >= '0' && choice[0] <= '9') && choice[1] == '\0')
-//         {
-//             input = atoi(choice);
-//             return input;
-//         }
-//         else
-//             return input;
-//         // that will return wrong input that detected by above used switch satement and shows error
-//         // after this again asked for input untill correct input
-//     } while (!isDigit);
-// }
-
 int getValidDigitInput() {
     int input = -1; 
     bool isValid = false; 
@@ -805,10 +833,22 @@ int getValidDigitInput() {
             cin.ignore(1000, '\n'); 
             setTextColor(12);
             cout<<"\t\t\t\t\t\t\t\tInvalid Choice!\n";
-        } else {
-            isValid = true;  
         }
-
+        else {
+            // Check if extra input in buffer
+            char extra;
+            if (cin.get(extra)) {
+                // If found shows error msj
+                if (extra != '\n') { 
+                    cin.clear();
+                    cin.ignore(1000, '\n');
+                    setTextColor(12);
+                    cout << "\t\t\t\t\t\t\t\tInvalid Choice!\n";
+                    continue;
+                }
+            }
+            isValid = true;  // Valid input
+        }
     } while (!isValid); 
 
     return input; 
@@ -917,32 +957,6 @@ string maskedInputPass()
     cout << endl;
     return inputPass;
 }
-string correctDataEntry()
-{
-    string input;
-    bool correct = false;
-    do
-    {
-        getline(cin, input); // input
-        // Check if input is not empty and contains at least one valid character
-        correct = false;
-        for (int i = 0; i < LengthOf(input); ++i)
-        { // validate here char by char
-            char c = input[i];
-            // check if lies b/w (A to Z)
-            if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z' || (c >= '0' && c <= '9')))
-            {
-                correct = true;
-                break;
-            }
-        }
-        if (!correct)
-        {
-            cout << "Invalid input! Enter again : ";
-        }
-    } while (!correct);
-    return input;
-}
 
 string validPhoneNo()
 {
@@ -950,7 +964,7 @@ string validPhoneNo()
     while (true)
     {
 
-        cin >> cellNo;
+        getline(cin,cellNo);
         // Check if length is exactly 11
         bool lengthValid = true;
         int length = LengthOf(cellNo); // Use customLength function
@@ -986,11 +1000,11 @@ string validPhoneNo()
 
 string validCNIC()
 {
-    char cnic[16]; // Temporary C-string to hold the input
+    char cnic[250]; // Temporary C-string to hold the input
 
     while (true)
     {
-        cin >> cnic;
+        cin.getline(cnic,250);
         bool isValid = true;
 
         // Check length be 15 digit with dashes
@@ -1039,24 +1053,18 @@ string validCNIC()
 }
 
 // valid name
-string validName()
+string validName(int minLen, int maxLen, string errorMsg)
 {
-    char name[250]; //large size for monkey tests
+    char name[300]; //large size for monkey tests
     while (true)
     {
-        cin.getline(name, 250); // Read with spaces
+        cin.getline(name, 300); // Read with spaces
 
         int len = LengthOf(name);
         bool isValid = true;
 
         // Check valid length
-        if (len < 3 || len > 25)
-        {
-            isValid = false;
-        }
-
-        // check 3rd char of name is not space
-        if (name[2] == ' ')
+        if (len < minLen || len > maxLen)
         {
             isValid = false;
         }
@@ -1093,7 +1101,7 @@ string validName()
         }
         else
         {
-            cout << "Invalid name! Please enter valid name : \n";
+            cout << errorMsg<<endl;
         }
     }
 }
@@ -1101,11 +1109,11 @@ string validName()
 // valid address
 string validAddress()
 {
-    char address[300];
+    char address[600];
 
     while (true)
     {
-        cin.getline(address, 300); // Read address including spaces
+        cin.getline(address, 600); // Read address including spaces
 
         int len = LengthOf(address);
         bool isValid = true;
@@ -1161,12 +1169,12 @@ string validAddress()
 
 string validUsername()
 {
-    char username[200]; // Max length of username is 15 characters + null terminator
+    char username[600]; // Max length of username is 15 characters + null terminator
 
     while (true)
     {
 
-        cin >> username;
+        cin.getline(username,600);
 
         int len = LengthOf(username);
         bool isValid = true;
@@ -1247,7 +1255,7 @@ string validGender()
     string gender;
     while (true)
     {
-        cin >> gender;
+        getline(cin,gender);
         // convert to lower case
         gender = toLowerCase(gender);
         if (gender == "male" || gender == "female" || gender == "other")
@@ -1264,10 +1272,10 @@ string validGender()
 //<----------------------------------mobile validations-------------------------------------->
 string validModelName()
 {
-    char modelName[100];
+    char modelName[600];
     while (true)
     {
-        cin.getline(modelName, 100); //read with spaces
+        cin.getline(modelName, 600); //read with spaces
 
         int len = LengthOf(modelName);
         bool isValid = true;
@@ -1319,14 +1327,14 @@ string validModelName()
 }
 
 string validStorage() {
-    char storage[500];   //large size so array hold large 
+    char storage[600];   //large size so array hold large 
     int storageValue = 0;  //for int type manuplation to check right storage
     bool isValid = false;
     bool isTB = false; 
 
     while (!isValid) {
         
-        cin.getline(storage, 500); 
+        cin.getline(storage, 600); 
 
         int length = LengthOf(storage);
         isValid = true; //valid until proved invalid
@@ -1556,11 +1564,13 @@ void addEmployee(string empUsername[], string empPwd[], string empName[], string
                 cout << "Enter Username : ";
                 empUsername[i] = validUsername();
                 cout << "Enter Password : ";
+                cin.ignore();
                 empPwd[i] = validPwd();
                 cout << "Enter employee full name : ";
-                empName[i] = validName();
+                cin.ignore();
+                empName[i] = validName(3,21,"Invalid name! Please enter valid name :");
                 cout << "Enter employee father's name : ";
-                empFname[i] = validName();
+                empFname[i] = validName(3,21,"Invalid name! Please enter valid name :");
                 cout << "Enter employee 11-degit phone number : ";
                 empCellNo[i] = validPhoneNo();
                 cout << "Enter employee cnic in format XXXXX-YYYYYYYY-Y : ";
@@ -1615,9 +1625,9 @@ void updateEmployee(string empUsername[], string empPwd[], string empName[], str
                 cout << "Enter new Password : ";
                 empPwd[i] = validPwd();
                 cout << "Enter employee full name : ";
-                empName[i] = validName();
+                empName[i] = validName(3,21,"Invalid name! Please enter valid name :");
                 cout << "Enter employee father's name : ";
-                empFname[i] = validName();
+                empFname[i] = validName(3,21,"Invalid name! Please enter valid name :");
                 cout << "Enter employee 11-degit phone number : ";
                 empCellNo[i] = validPhoneNo();
                 cout << "Enter employee cnic number : ";
@@ -1770,7 +1780,8 @@ void addMobiles(string mobileBrand[], string mobileModel[], string mobileSpecs[]
             if (!isMobileExist[i])
             {
                 cout << "Enter mobile Brand : ";
-                mobileBrand[i] = validName();
+                cin.ignore();
+                mobileBrand[i] = validName(2,15,"Invalid Brand name! Please enter valid Brand :");
                 cout << "Enter model: ";
                 mobileModel[i] = validModelName();
                 cout << "Enter storage in (GB or TB): ";
@@ -1778,9 +1789,9 @@ void addMobiles(string mobileBrand[], string mobileModel[], string mobileSpecs[]
                 cout << "Enter specs: ";
                 mobileSpecs[i] = validSpecs();
                 cout << "Enter mobile color: ";
-                mobileColor[i] = validName();
+                mobileColor[i] = validName(3,10,"Invalid Color name! Please enter valid color :");
                 cout << "Enter supplier name: ";
-                mobileSupplierName[i] = validName();
+                mobileSupplierName[i] = validName(3,21,"Invalid name! Please enter valid name :");
                 cout << "Enter quantity: ";
                 mobileQty[i] = validIntInput("Quantity", 1, 1000);
                 cout << "Enter purchase Price: ";
@@ -1831,17 +1842,17 @@ void updateMobiles(string mobileBrand[], string mobileModel[], string mobileSpec
             if (mobileModel[i] == searchMob)
             {
                 cout << "Enter mobile Brand : ";
-                mobileBrand[i] = validName();
+                mobileBrand[i] = validName(2,15,"Invalid Brand name! Please enter valid Brand :");
                 cout << "Enter model: ";
                 mobileModel[i] = validModelName();
                 cout << "Enter storage in (GB or TB): ";
                 mobileStorage[i] = validStorage();
                 cout << "Enter specs: ";
-                mobileSpecs[i] = correctDataEntry();
+                mobileSpecs[i] = validSpecs();
                 cout << "Enter mobile color: ";
-                mobileColor[i] = validName();
+                mobileColor[i] = validName(3,10,"Invalid Color name! Please enter valid name :");
                 cout << "Enter supplier name: ";
-                mobileSupplierName[i] = validName();
+                mobileSupplierName[i] = validName(3,21,"Invalid name! Please enter valid name :");
                 cout << "Enter quantity: ";
                 mobileQty[i] = validIntInput("Quantity", 1, 1000);
                 cout << "Enter purchase Price: ";
@@ -2243,6 +2254,8 @@ void managePendingOrders(string mobileBrand[], string mobileModel[], string mobi
                                             tRevenue += mobSalePrice[k];
                                             tCost += mobPurchasePrice[k];
                                             mobSold += orderQty[cus][cusField];
+                                            orderCounts[cus]--;
+                                            isOrderExist[cus][cusField] = false;
                                             saveProfitReport(tCost, tRevenue, tProfit, mobSold);
                                         }
                                         isItemIdCorrect = true;
@@ -2310,7 +2323,7 @@ void addCustomer(string cusUsername[], string cusPwd[], string cusName[], string
                 cin.ignore(100, '\n');
                 cusPwd[i] = validPwd();
                 cout << "Enter your name :";
-                cusName[i] = validName();
+                cusName[i] = validName(3,21,"Invalid name! Please enter valid name :");
                 cout << "Enter your phone number : ";
                 cusCell[i] = validPhoneNo();
                 cout << "Enter your date of birth : ";
@@ -2365,7 +2378,7 @@ void updateCustomer(string cusUsername[], string cusPwd[], string cusName[], str
                 cin.ignore();
                 cusPwd[i] = validPwd();
                 cout << "Enter your name :";
-                cusName[i] = validName();
+                cusName[i] = validName(3,21,"Invalid name! Please enter valid name :");
                 cout << "Enter your phone number : ";
                 cusCell[i] = validPhoneNo();
                 cout << "Enter your date of birth : ";
