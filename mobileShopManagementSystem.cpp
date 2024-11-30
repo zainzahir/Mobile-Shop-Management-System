@@ -2183,7 +2183,7 @@ void cusOrderManagment(string mobileBrand[], string mobileModel[], string mobile
         { // is customer exist
             for (int cusField = 0; cusField < MaxOrder; cusField++)
             {
-                if (isOrderExist[cus][cusField])
+                if (isOrderExist[cusField])
                 {
                     for (int k = 0; k < MaxMobile; k++) // this loop just to show mobile details by retrive item id
                     {                                   // extrcting the data of mobile by itemId stores at field i
@@ -2218,6 +2218,7 @@ void cusOrderManagment(string mobileBrand[], string mobileModel[], string mobile
         cout << "\n\t\tNo pending orders found :)" << endl;
     }
 }
+
 
 void managePendingOrders(string mobileBrand[], string mobileModel[], string mobileColor[], int mobileQty[], string mobileStorage[], int mobPurchasePrice[], int mobSalePrice[], double discount[], string status[], bool isMobileExist[], int MaxMobile, int mobItemId[], int &mobileCount, int mobProfit[], int orderQty[][MaxOrder], int orders[][MaxOrder], int orderPrices[][MaxOrder], int orderCounts[], bool isOrderExist[][MaxOrder], string orderStatus[][MaxOrder], int MaxOrder, int CusSize, bool isCustomerExit[], string cusUsername[], string cusName[], bool isProfitExist[], int totalRevenue[], int totalCost[], int &tCost, int &tRevenue, int &tProfit, int &mobSold,string mobileSupplierName[], string mobileSpecs[],int mobMinStockLevel[])
 {
