@@ -6,7 +6,7 @@
 #include <fstream>
 using namespace std;
 //<-------------constants of 2D array----------------------->
-const int MaxOrder = 10; // 10 orders per person
+const int MaxOrder = 15; // 15 orders per person
 
 // main interface of App
 void mainInterface(); // enables to select type of user
@@ -53,6 +53,7 @@ string validName(int minLen, int maxLen, string errorMsg);
 string validAddress();
 string validUsername();
 string validPwd(); // check user enter valid pwd at time of creating account
+string validGender();
 //<---------------------mobile validations-------------------->
 string validModelName();
 string validStorage();
@@ -65,7 +66,6 @@ string tokenizer(string str, int field);                 // seperate by comma he
 int convertToInt(const string &str, int start, int end); // for date manuplation used
 int LengthOf(const string &str);
 string toLowerCase(string str);
-string validGender();
 //<------------------employee management-------------------------->
 // add employee
 void addEmployee(string empUsername[], string empPwd[], string empName[], string empFname[], string empCellNo[], string empAddress[], string empCnic[], string empDOB[], string empGender[], bool isEmpExist[], int EmpSize, int &empCount);
@@ -86,7 +86,7 @@ void viewMobiles(string mobileBrand[], string mobileModel[], string mobileSpecs[
 void lowStock(string mobileBrand[], string mobileModel[], string mobileSupplierName[], int mobileQty[], bool isMobileExist[], int MaxMobile, int mobItemId[], int &mobileCount, int mobMinStockLevel[]);
 //<-----------------------customer order management---------------------------------------->
 void cusOrderManagment(string mobileBrand[], string mobileModel[], string mobileColor[], int mobileQty[], string mobileStorage[], int mobPurchasePrice[], int mobSalePrice[], double discount[], string status[], bool isMobileExist[], int MaxMobile, int mobItemId[], int &mobileCount, int orderQty[][MaxOrder], int orders[][MaxOrder], int orderPrices[][MaxOrder], int orderCounts[], bool isOrderExist[][MaxOrder], string orderStatus[][MaxOrder], int MaxOrder, int CusSize, bool isCustomerExit[], string cusUsername[], string cusName[]);
-void managePendingOrders(string mobileBrand[], string mobileModel[], string mobileColor[], int mobileQty[], string mobileStorage[], int mobPurchasePrice[], int mobSalePrice[], double discount[], string status[], bool isMobileExist[], int MaxMobile, int mobItemId[], int &mobileCount, int mobProfit[], int orderQty[][MaxOrder], int orders[][MaxOrder], int orderPrices[][MaxOrder], int orderCounts[], bool isOrderExist[][MaxOrder], string orderStatus[][MaxOrder], int MaxOrder, int CusSize, bool isCustomerExit[], string cusUsername[], string cusName[], bool isProfitExist[], int totalRevenue[], int totalCost[], int &tCost, int &tRevenue, int &tProfit, int &mobSold,string mobileSupplierName[], string mobileSpecs[],int mobMinStockLevel[]);
+void managePendingOrders(string mobileBrand[], string mobileModel[], string mobileColor[], int mobileQty[], string mobileStorage[], int mobPurchasePrice[], int mobSalePrice[], double discount[], string status[], bool isMobileExist[], int MaxMobile, int mobItemId[], int &mobileCount, int mobProfit[], int orderQty[][MaxOrder], int orders[][MaxOrder], int orderPrices[][MaxOrder], int orderCounts[], bool isOrderExist[][MaxOrder], string orderStatus[][MaxOrder], int MaxOrder, int CusSize, bool isCustomerExit[], string cusUsername[], string cusName[], bool isProfitExist[], int totalRevenue[], int totalCost[], int &tCost, int &tRevenue, int &tProfit, int &mobSold, string mobileSupplierName[], string mobileSpecs[], int mobMinStockLevel[]);
 //<------------------Customer profiles-------------------------->
 void addCustomer(string cusUsername[], string cusPwd[], string cusName[], string cusCell[], string cusAddress[], string cusDOB[], string cusGender[], bool isCustomerExit[], int CusSize, int &customerCount);
 void viewAllCustomer(string cusUsername[], string cusPwd[], string cusName[], string cusCell[], string cusAddress[], string cusDOB[], string cusGender[], bool isCustomerExit[], int CusSize, int &customerCount);
@@ -112,8 +112,8 @@ void loadInventryData(string mobileBrand[], string mobileModel[], string mobileS
 void saveProfitReport(int &tCost, int &tRevenue, int &tProfit, int &mobSold);
 void loadProfitReport(int &tCost, int &tRevenue, int &tProfit, int &mobSold);
 //<-------------------------------order data save & load--------------------------------->
-void saveOrders(bool isCustomerExit[], int orders[][10], int orderQty[][10], string orderStatus[][10], bool isOrderExist[][10], int MaxOrder, int CusSize, string typeofSave, string fileName);
-void loadOrders(bool isCustomerExit[], int orders[][10], int orderQty[][10], string orderStatus[][10], bool isOrderExist[][10], int MaxOrder, int CusSize, int orderCounts[], string typeofSave, string fileName);
+void saveOrders(bool isCustomerExit[], int orders[][MaxOrder], int orderQty[][MaxOrder], string orderStatus[][MaxOrder], bool isOrderExist[][MaxOrder], int MaxOrder, int CusSize, string typeofSave, string fileName);
+void loadOrders(bool isCustomerExit[], int orders[][MaxOrder], int orderQty[][MaxOrder], string orderStatus[][MaxOrder], bool isOrderExist[][MaxOrder], int MaxOrder, int CusSize, int orderCounts[], string typeofSave, string fileName);
 
 int main()
 {
@@ -262,10 +262,7 @@ int main()
     loadEmployeeData(empUsername, empPwd, empName, empFname, empCellNo, empAddress, empCnic, empDOB, empGender, isEmpExist, EmpSize, empCount);
     loadCustomerData(cusUsername, cusPwd, cusName, cusCell, cusAddress, cusDOB, cusGender, isCustomerExit, CusSize, customerCount);
     loadInventryData(mobileBrand, mobileModel, mobileSpecs, mobileSupplierName, mobileColor, mobileQty, mobileStorage, mobPurchasePrice, mobSalePrice, mobMinStockLevel, discount, status, isMobileExist, MaxMobile, mobItemId, mobileCount);
-    saveOrders(isCustomerExit, orders, orderQty, orderStatus, isOrderExist, MaxOrder, CusSize, "status", "orderStatus.txt");
-    saveOrders(isCustomerExit, orders, orderQty, orderStatus, isOrderExist, MaxOrder, CusSize, "qty", "orderStatus.txt");
-    saveOrders(isCustomerExit, orders, orderQty, orderStatus, isOrderExist, MaxOrder, CusSize, "order", "orderStatus.txt");
-    loadOrders(isCustomerExit, orders, orderQty, orderStatus, isOrderExist, MaxOrder, CusSize, orderCounts, "", "orderId.txt");
+    loadOrders(isCustomerExit, orders, orderQty, orderStatus, isOrderExist, MaxOrder, CusSize, orderCounts, "", "orders.txt");
     loadProfitReport(tCost, tRevenue, tProfit, mobSold);
     do
     {
@@ -523,7 +520,7 @@ int main()
                 }
                 case 4:
                 { // order management
-                    managePendingOrders(mobileBrand, mobileModel, mobileColor, mobileQty, mobileStorage, mobPurchasePrice, mobSalePrice, discount, status, isMobileExist, MaxMobile, mobItemId, mobileCount, mobProfit, orderQty, orders, orderPrices, orderCounts, isOrderExist, orderStatus, MaxOrder, CusSize, isCustomerExit, cusUsername, cusName, isProfitExist, totalRevenue, totalCost, tCost, tRevenue, tProfit, mobSold,mobileSupplierName,mobileSpecs,mobMinStockLevel);
+                    managePendingOrders(mobileBrand, mobileModel, mobileColor, mobileQty, mobileStorage, mobPurchasePrice, mobSalePrice, discount, status, isMobileExist, MaxMobile, mobItemId, mobileCount, mobProfit, orderQty, orders, orderPrices, orderCounts, isOrderExist, orderStatus, MaxOrder, CusSize, isCustomerExit, cusUsername, cusName, isProfitExist, totalRevenue, totalCost, tCost, tRevenue, tProfit, mobSold, mobileSupplierName, mobileSpecs, mobMinStockLevel);
                     break;
                 }
                 case 5:
@@ -629,7 +626,7 @@ int main()
                 }
                 case 3:
                 {
-                    managePendingOrders(mobileBrand, mobileModel, mobileColor, mobileQty, mobileStorage, mobPurchasePrice, mobSalePrice, discount, status, isMobileExist, MaxMobile, mobItemId, mobileCount, mobProfit, orderQty, orders, orderPrices, orderCounts, isOrderExist, orderStatus, MaxOrder, CusSize, isCustomerExit, cusUsername, cusName, isProfitExist, totalRevenue, totalCost, tCost, tRevenue, tProfit, mobSold,mobileSupplierName,mobileSpecs,mobMinStockLevel);
+                    managePendingOrders(mobileBrand, mobileModel, mobileColor, mobileQty, mobileStorage, mobPurchasePrice, mobSalePrice, discount, status, isMobileExist, MaxMobile, mobItemId, mobileCount, mobProfit, orderQty, orders, orderPrices, orderCounts, isOrderExist, orderStatus, MaxOrder, CusSize, isCustomerExit, cusUsername, cusName, isProfitExist, totalRevenue, totalCost, tCost, tRevenue, tProfit, mobSold, mobileSupplierName, mobileSpecs, mobMinStockLevel);
                     break;
                 }
                 case 4:
@@ -1138,7 +1135,7 @@ string validAddress()
         bool isValid = true;
 
         // Check length constraints
-        if (len < 4 || len > 100)
+        if (len < 3 || len > 100)
         {
             isValid = false;
         }
@@ -2183,7 +2180,7 @@ void cusOrderManagment(string mobileBrand[], string mobileModel[], string mobile
         { // is customer exist
             for (int cusField = 0; cusField < MaxOrder; cusField++)
             {
-                if (isOrderExist[cusField])
+                if (isOrderExist[cus][cusField])
                 {
                     for (int k = 0; k < MaxMobile; k++) // this loop just to show mobile details by retrive item id
                     {                                   // extrcting the data of mobile by itemId stores at field i
@@ -2219,8 +2216,7 @@ void cusOrderManagment(string mobileBrand[], string mobileModel[], string mobile
     }
 }
 
-
-void managePendingOrders(string mobileBrand[], string mobileModel[], string mobileColor[], int mobileQty[], string mobileStorage[], int mobPurchasePrice[], int mobSalePrice[], double discount[], string status[], bool isMobileExist[], int MaxMobile, int mobItemId[], int &mobileCount, int mobProfit[], int orderQty[][MaxOrder], int orders[][MaxOrder], int orderPrices[][MaxOrder], int orderCounts[], bool isOrderExist[][MaxOrder], string orderStatus[][MaxOrder], int MaxOrder, int CusSize, bool isCustomerExit[], string cusUsername[], string cusName[], bool isProfitExist[], int totalRevenue[], int totalCost[], int &tCost, int &tRevenue, int &tProfit, int &mobSold,string mobileSupplierName[], string mobileSpecs[],int mobMinStockLevel[])
+void managePendingOrders(string mobileBrand[], string mobileModel[], string mobileColor[], int mobileQty[], string mobileStorage[], int mobPurchasePrice[], int mobSalePrice[], double discount[], string status[], bool isMobileExist[], int MaxMobile, int mobItemId[], int &mobileCount, int mobProfit[], int orderQty[][MaxOrder], int orders[][MaxOrder], int orderPrices[][MaxOrder], int orderCounts[], bool isOrderExist[][MaxOrder], string orderStatus[][MaxOrder], int MaxOrder, int CusSize, bool isCustomerExit[], string cusUsername[], string cusName[], bool isProfitExist[], int totalRevenue[], int totalCost[], int &tCost, int &tRevenue, int &tProfit, int &mobSold, string mobileSupplierName[], string mobileSpecs[], int mobMinStockLevel[])
 {
     int choice;
     int stChoice;
@@ -2318,7 +2314,7 @@ void managePendingOrders(string mobileBrand[], string mobileModel[], string mobi
                                         isItemIdCorrect = true;
                                         setTextColor(10); // green
                                         saveInventryData(mobileBrand, mobileModel, mobileSpecs, mobileSupplierName, mobileColor, mobileQty, mobileStorage, mobPurchasePrice, mobSalePrice, mobMinStockLevel, discount, status, isMobileExist, MaxMobile, mobItemId, mobileCount);
-                                        saveOrders(isCustomerExit, orders, orderQty, orderStatus, isOrderExist, MaxOrder, CusSize, "", "orderId.txt");
+                                        saveOrders(isCustomerExit, orders, orderQty, orderStatus, isOrderExist, MaxOrder, CusSize, "", "orders.txt");
                                         cout << "\n\t\t\tOrder status updated successfully......." << endl;
                                         cin.get();
                                         break;
@@ -2378,7 +2374,6 @@ void addCustomer(string cusUsername[], string cusPwd[], string cusName[], string
                 cout << "Enter Username : ";
                 cusUsername[i] = validUsername();
                 cout << "Enter Password : ";
-                cin.ignore(100, '\n');
                 cusPwd[i] = validPwd();
                 cout << "Enter your name :";
                 cusName[i] = validName(3, 21, "Invalid name! Please enter valid name :");
@@ -2387,9 +2382,9 @@ void addCustomer(string cusUsername[], string cusPwd[], string cusName[], string
                 cout << "Enter your date of birth : ";
                 cusDOB[i] = validDate();
                 cout << "Enter your gender : ";
+                cin.ignore();
                 cusGender[i] = validGender();
                 cout << "Enter your Address : ";
-                cin.ignore(100, '\n');
                 cusAddress[i] = validAddress();
                 customerCount++;
                 isCustomerExit[i] = true;
@@ -2433,7 +2428,6 @@ void updateCustomer(string cusUsername[], string cusPwd[], string cusName[], str
                 cout << "Enter Username : ";
                 cusUsername[i] = validUsername();
                 cout << "Enter Password : ";
-                cin.ignore();
                 cusPwd[i] = validPwd();
                 cout << "Enter your name :";
                 cusName[i] = validName(3, 21, "Invalid name! Please enter valid name :");
@@ -2442,6 +2436,7 @@ void updateCustomer(string cusUsername[], string cusPwd[], string cusName[], str
                 cout << "Enter your date of birth : ";
                 cusDOB[i] = validDate();
                 cout << "Enter your gender : ";
+                cin.ignore();
                 cusGender[i] = validGender();
                 cout << "Enter your Address : ";
                 cusAddress[i] = validAddress();
@@ -2668,10 +2663,7 @@ void placeOrder(string mobileBrand[], string mobileModel[], string mobileSpecs[]
         setTextColor(12); // Red
         cout << "\n\tNo Mobile added Yet!" << endl;
     }
-    // saveOrders(isCustomerExit, orders, orderQty, orderStatus, isOrderExist, MaxOrder, CusSize, typeofSave, fileName);
-    saveOrders(isCustomerExit, orders, orderQty, orderStatus, isOrderExist, MaxOrder, CusSize, "", "orderId.txt");
-    // saveOrders(isCustomerExit, orders, orderQty, orderStatus, isOrderExist, MaxOrder, CusSize, "qty", "orderQty.txt");
-    // saveOrders(isCustomerExit, orders, orderQty, orderStatus, isOrderExist, MaxOrder, CusSize, "status", "orderStatus.txt");
+    saveOrders(isCustomerExit, orders, orderQty, orderStatus, isOrderExist, MaxOrder, CusSize, "", "orders.txt");
 
     cin.get();
 }
@@ -2702,7 +2694,7 @@ void orderTracking(string mobileBrand[], string mobileModel[], string mobileColo
         int counter = 1;
         for (int i = 0; i < MaxOrder; i++)
         { /*for order findind at which index order exist means field*/
-            if (isOrderExist[i])
+            if (isOrderExist[cusIndex][i])
             {
                 for (int k = 0; k < MaxMobile; k++)
                 { // extrcting the data of mobile by itemId stores at field i
@@ -3366,7 +3358,7 @@ void loadInventryData(string mobileBrand[], string mobileModel[], string mobileS
 }
 //<----------------------------save pending order------------------------------->
 
-void saveOrders(bool isCustomerExit[], int orders[][10], int orderQty[][10], string orderStatus[][10], bool isOrderExist[][10], int MaxOrder, int CusSize, string typeofSave, string fileName)
+void saveOrders(bool isCustomerExit[], int orders[][MaxOrder], int orderQty[][MaxOrder], string orderStatus[][MaxOrder], bool isOrderExist[][MaxOrder], int MaxOrder, int CusSize, string typeofSave, string fileName)
 {
     ofstream fout(fileName); // Open the file for writing
     if (!fout)
@@ -3426,7 +3418,7 @@ void saveOrders(bool isCustomerExit[], int orders[][10], int orderQty[][10], str
     fout.close(); // Close the file
 }
 
-void loadOrders(bool isCustomerExit[], int orders[][10], int orderQty[][10], string orderStatus[][10], bool isOrderExist[][10], int MaxOrder, int CusSize, int orderCounts[], string typeofSave, string fileName)
+void loadOrders(bool isCustomerExit[], int orders[][MaxOrder], int orderQty[][MaxOrder], string orderStatus[][MaxOrder], bool isOrderExist[][MaxOrder], int MaxOrder, int CusSize, int orderCounts[], string typeofSave, string fileName)
 {
     ifstream fin(fileName); // Open the file for reading
     if (!fin)
@@ -3440,14 +3432,16 @@ void loadOrders(bool isCustomerExit[], int orders[][10], int orderQty[][10], str
     while (getline(fin, line) && rows < CusSize)
     {
         int cols = 0;
+
         // Line 1: Item IDs
         for (int k = 1;; k++)
         {
             string temp = tokenizer(line, k);
             if (temp.empty())
-                break;                                // No more fields to extract
-            orders[rows][cols++] = stringToInt(temp); // Store in orders array
-            isOrderExist[rows][cols] = true;
+                break;                                
+            orders[rows][cols] = stringToInt(temp);   // Store in orders array
+            isOrderExist[rows][cols] = true;          
+            cols++;                                   // Increment column
             if (cols >= MaxOrder)
                 break; // Ensure we don't exceed MaxCols
         }
@@ -3460,8 +3454,9 @@ void loadOrders(bool isCustomerExit[], int orders[][10], int orderQty[][10], str
             string temp = tokenizer(line, k);
             if (temp.empty())
                 break;
-            orderQty[rows][cols++] = stringToInt(temp); // Store in orderQty array
-            orderCounts[rows]++;
+            orderQty[rows][cols] = stringToInt(temp); // Store in orderQty array
+            orderCounts[rows]++;                      // Increment order count
+            cols++;                                   // Increment column
             if (cols >= MaxOrder)
                 break;
         }
@@ -3474,7 +3469,8 @@ void loadOrders(bool isCustomerExit[], int orders[][10], int orderQty[][10], str
             string temp = tokenizer(line, k);
             if (temp.empty())
                 break;
-            orderStatus[rows][cols++] = temp; // Store in orderStatus array
+            orderStatus[rows][cols] = temp;           // Store in orderStatus array
+            cols++;                                   // Increment column
             if (cols >= MaxOrder)
                 break;
         }
@@ -3502,7 +3498,7 @@ void saveProfitReport(int &tCost, int &tRevenue, int &tProfit, int &mobSold)
 
     fout.close();
 }
-//load profit report
+// load profit report
 void loadProfitReport(int &tCost, int &tRevenue, int &tProfit, int &mobSold)
 {
     ifstream fin;
