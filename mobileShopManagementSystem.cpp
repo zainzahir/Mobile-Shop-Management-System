@@ -150,7 +150,7 @@ void updateMobiles(Mobile mob[], int MaxMobile, int &mobileCount);
 void deleteMobiles(Mobile mob[], int MaxMobile, int &mobileCount);
 
 // here bool isAdmin determine wether to show full detailed list or ristricted (1 for admin, 0 for others)
-void viewMobiles(Mobile mob[], int MaxMobile, int &mobileCount, bool isAdmin); 
+void viewMobiles(Mobile mob[], int MaxMobile, int &mobileCount, bool isAdmin);
 
 void lowStock(Mobile mob[], int MaxMobile, int &mobileCount);
 
@@ -1066,7 +1066,7 @@ string validName(int minLen, int maxLen, string errorMsg)
         bool isValid = true;
 
         // Check valid length
-        if (len <= minLen || len >= maxLen)
+        if (len < minLen || len > maxLen)
         {
             isValid = false;
         }
@@ -1218,7 +1218,7 @@ string validUsername()
         }
         else
         {
-            cout << "Invalid username! Please try again.\n";
+            cout << "Invalid username! Please try again : ";
         }
     }
 }
@@ -1607,7 +1607,6 @@ void addEmployee(Employee emp[], int EmpSize, int &empCount)
                 cin.ignore();
                 emp[i].pwd = validPwd();
                 cout << "Enter employee full name : ";
-                cin.ignore();
                 emp[i].name = validName(3, 21, "Invalid name! Please enter valid name :");
                 cout << "Enter employee father's name : ";
                 emp[i].fatherName = validName(3, 21, "Invalid name! Please enter valid name :");
@@ -1666,7 +1665,6 @@ void updateEmployee(Employee emp[], int EmpSize, int &empCount)
                 cout << "Enter new Password : ";
                 emp[i].pwd = validPwd();
                 cout << "Enter employee full name : ";
-                cin.ignore();
                 emp[i].name = validName(3, 21, "Invalid name! Please enter valid name :");
                 cout << "Enter employee father's name : ";
                 emp[i].fatherName = validName(3, 21, "Invalid name! Please enter valid name :");
@@ -1736,7 +1734,6 @@ void deleteEmployee(Employee emp[], int EmpSize, int &empCount)
                 isUserFound = true;
                 setTextColor(10); // green
                 cout << "\n\t\t\t\t\t\t\t\tEmployee data deleted successfully......." << endl;
-                cin.get();
                 break;
             }
         }
@@ -2212,6 +2209,7 @@ void managePendingOrders(Mobile mob[], int MaxMobile, int &mobileCount, string u
     bool isUserFound = false;
     bool isItemIdCorrect = false;
     string updateStatus = "";
+
     do
     {
         ShowPendingOrders(mob, MaxMobile, mobileCount, username, pwd, cus, CusSize, cust);
@@ -2228,74 +2226,130 @@ void managePendingOrders(Mobile mob[], int MaxMobile, int &mobileCount, string u
         setTextColor(14);
         cout << "\t ------------------------" << endl;
         choice = getValidDigitInput(); // assures valid input digit 0-9
+
         switch (choice)
         {
         case 1:
         {
-            cout << "Enter username of customer :";
+            cout << "\tEnter username of customer: ";
             inputUsername = validUsername();
-            cout << "Enter item id : ";
-            itemId = validIntInput("Item Id", 0, 1000);
-            cout << "Select new status:" << endl;
-            cout << "1. Shipped" << endl;
-            cout << "2. Delivered" << endl;
-            cout << "3. Out of Stock" << endl;
+            cout << "\tEnter item ID: ";
+            itemId = validIntInput("Item ID", 0, 1000);
+
+            cout << "\tSelect new status:" << endl;
+            cout << "\t1. Shipped" << endl;
+            cout << "\t2. Delivered" << endl;
+            cout << "\t3. Out of Stock" << endl;
+
             do
             {
                 stChoice = -1;
                 stChoice = getValidDigitInput();
-                if (stChoice == 1)
-                {
-                    updateStatus = "Shipped";
-                }
-                else if (stChoice == 2)
-                {
-                    updateStatus = "Delivered";
-                }
-                else if (stChoice == 3)
-                {
-                    updateStatus = "Out of Stock";
-                }
-                else
-                {
-                    invalidErrorMessage(); // shows invalid error message
+                if (stChoice != 1 && stChoice != 2 && stChoice != 3)
+                { //if user enter invalid choice
+                   invalidErrorMessage(); // shows invalid error message
                 }
             } while (stChoice != 1 && stChoice != 2 && stChoice != 3);
-            // updating status
+
             for (int cusIndex = 0; cusIndex < CusSize; cusIndex++)
             {
                 if (inputUsername == cus[cusIndex].username)
-                { // cusotmer exist but check wwether placed order or not
+                {
+                    isUserFound = true;
                     for (int cusField = 0; cusField < MaxOrder; cusField++)
                     {
                         if (cust[cusIndex].orders[cusField].isExist && cust[cusIndex].orders[cusField].itemId == itemId)
                         {
-                            isUserFound = true;
-                            cust[cusIndex].orders[cusField].status = updateStatus;
-                            // mobile qty decreaded by this
-                            for (int k = 0; k < MaxMobile; k++)
+                            isItemIdCorrect = true;
+                            //this is used if mistakely status updated to delivered 
+                            if (stChoice == 1 && cust[cusIndex].orders[cusField].status == "Delivered")
                             {
-                                if (mob[k].itemId == itemId)
-                                { // means that particuler mbl details exist at k index
-                                    if (stChoice == 1 || stChoice == 2)
+                                setTextColor(10); // Green
+                                cust[cusIndex].orders[cusField].status = "Shipped";
+                                cout << "\n\t\t\tOrder status updated back to Shipped successfully.\n";
+                                saveOrders(cus, CusSize, cust);
+                                cin.get();
+                            }
+                            else if (cust[cusIndex].orders[cusField].status == "Delivered")
+                            {
+                                setTextColor(12); // Red
+                                cout << "\tThis order is already Delivered. Status cannot be changed further.\n";
+                                cin.get();
+                            }
+                            else if (cust[cusIndex].orders[cusField].status == "Shipped" && stChoice == 1)
+                            {
+                                setTextColor(12); // Red
+                                cout << "\tThis order is already Shipped. Please select a different option.\n";
+                                cin.get();
+                            }
+                            else if (cust[cusIndex].orders[cusField].status == "Shipped" && stChoice == 3)
+                            {
+                                setTextColor(12); // Red
+                                cout << "\torder's status cannot be updated to 'Out of Stock' once it has been shipped.\n";
+                                cin.get();
+                            }
+                            else if (cust[cusIndex].orders[cusField].status == "Pending" && stChoice == 2)
+                            {
+                                setTextColor(12); // Red
+                                cout << "\tThe order's status cannot be updated directly to 'Delivered'.\n";
+                                cin.get();
+                            }
+                            else if (cust[cusIndex].orders[cusField].status == "Out of Stock" && stChoice == 2)
+                            {
+                                setTextColor(12); // Red
+                                cout << "\tThe order's status cannot be updated directly to 'Delivered'.\n";
+                                cin.get();
+                            }
+                            else
+                            {
+                                if (stChoice == 1 && cust[cusIndex].orders[cusField].status != "Shipped")
+                                {
+                                    // Update status to Shipped & decrease inventory
+                                    cust[cusIndex].orders[cusField].status = "Shipped";
+                                    for (int k = 0; k < MaxMobile; k++)
                                     {
-                                        mob[k].qty -= cust[cusIndex].orders[cusField].qty;
-                                        // total profit
-                                        total_Profit += (mob[k].salePrice - mob[k].purchasePrice) * cust[cusIndex].orders[cusField].qty;
-                                        total_Revenue += mob[k].salePrice * cust[cusIndex].orders[cusField].qty;
-                                        total_Cost += mob[k].purchasePrice * cust[cusIndex].orders[cusField].qty;
-                                        mobSold += cust[cusIndex].orders[cusField].qty;
-                                        if (cust[cusIndex].orderCount > 1)
-                                            cust[cusIndex].orderCount--;
-                                        saveProfitReport(total_Cost, total_Revenue, total_Profit, mobSold);
+                                        if (mob[k].itemId == itemId)
+                                        {
+                                            mob[k].qty -= cust[cusIndex].orders[cusField].qty;
+                                            total_Profit += (mob[k].salePrice - mob[k].purchasePrice) * cust[cusIndex].orders[cusField].qty;
+                                            total_Revenue += mob[k].salePrice * cust[cusIndex].orders[cusField].qty;
+                                            total_Cost += mob[k].purchasePrice * cust[cusIndex].orders[cusField].qty;
+                                            mobSold += cust[cusIndex].orders[cusField].qty;
+                                            if (cust[cusIndex].orderCount > 1)
+                                                cust[cusIndex].orderCount--;
+                                            saveProfitReport(total_Cost, total_Revenue, total_Profit, mobSold);
+                                            saveInventryData(mob, MaxMobile, mobileCount);
+                                            saveOrders(cus, CusSize, cust);
+                                            break;
+                                        }
                                     }
-                                    isItemIdCorrect = true;
-                                    setTextColor(10); // green
-                                    saveInventryData(mob, MaxMobile, mobileCount);
-                                    saveOrders(cus, CusSize, cust);
-                                    cout << "\n\t\t\tOrder status updated successfully......." << endl;
+                                    setTextColor(10); // Green
+                                    cout << "\n\t\t\tOrder status updated to Shipped successfully.\n";
                                     cin.get();
-                                    break;
+                                }
+                                else if (stChoice == 2 && cust[cusIndex].orders[cusField].status == "Shipped")
+                                {
+                                    // Update status to Delivered without modifying inventory
+                                    cust[cusIndex].orders[cusField].status = "Delivered";
+                                    setTextColor(10); // Green
+                                    saveOrders(cus, CusSize, cust);
+                                    cout << "\n\t\t\tOrder status updated to Delivered successfully.\n";
+                                    cin.get();
+                                }
+                                else if (stChoice == 3)
+                                {
+                                    // Update status to Out of Stock
+                                    cust[cusIndex].orders[cusField].status = "Out of Stock";
+                                    setTextColor(10); // Green
+                                    saveOrders(cus, CusSize, cust);
+                                    cout << "\n\t\t\tOrder status updated to Out of Stock successfully.\n";
+                                    cin.get();
+                                }
+                                else
+                                {
+                                    setTextColor(12); // Red
+                                    cout << "\tInvalid status update request.\n";
+                                    cin.get();
                                 }
                             }
                             break;
@@ -2307,13 +2361,13 @@ void managePendingOrders(Mobile mob[], int MaxMobile, int &mobileCount, string u
             {
                 setTextColor(12); // Red
                 cout << "\tNo customer found with the provided username.\n";
-                cin.get();
+                cin.ignore();
             }
-            if (!isItemIdCorrect)
+            if (isUserFound && !isItemIdCorrect)
             {
                 setTextColor(12); // Red
-                cout << "Incorrect item ID!\n";
-                cin.get();
+                cout << "\tIncorrect item ID!\n";
+                cin.ignore();
             }
             break;
         }
@@ -2325,7 +2379,9 @@ void managePendingOrders(Mobile mob[], int MaxMobile, int &mobileCount, string u
         }
     } while (choice != 0);
     choice = -1;
+    saveOrders(cus, CusSize, cust);
 }
+
 //----------------------------------------------Customer related functions------------------------------------------------>
 void addCustomer(Customer cus[], int CusSize, int &customerCount)
 {
@@ -2391,7 +2447,7 @@ void updateCustomer(Customer cus[], int CusSize, int &customerCount)
     {
         string username;
         bool isUserFound = false;
-        cout << " Enter username of Customer : ";
+        cout << " Enter existing username of Customer : ";
         username = validUsername();
         for (int i = 0; i < CusSize; i++)
         {
@@ -2466,7 +2522,6 @@ void deleteCustomer(Customer cus[], int CusSize, int &customerCount)
                 setTextColor(10); // green
                 cout << "\n\t\t\t\t\t\t\t\tCustomer data deleted successfully......." << endl;
                 SaveCustomerData(cus, CusSize, customerCount);
-                cin.get();
                 cin.get();
                 break;
             }
