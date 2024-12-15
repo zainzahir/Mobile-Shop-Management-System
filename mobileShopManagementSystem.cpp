@@ -104,6 +104,8 @@ bool ManagerLoginChecker(string realUsername, string realPass);
 bool EmployeeloginChecker(Employee emp[], int EmpSize);
 
 //<---------------employee and customer validations----------------------->
+bool isCusUsernameUnique(const string &username, Customer cus[], int CusSize); //ensure username is unique in system
+bool isEmpUsernameUnique(const string &username, Employee emp[], int EmpSize); 
 void invalidErrorMessage();   // invalid option error
 int getValidDigitInput();     // make sure input is 0 - 9 single digit
 string maskedInputPass();     // input masked password from user
@@ -811,6 +813,29 @@ bool EmployeeloginChecker(Employee emp[], int EmpSize)
         }
     }
     return false;
+}
+//check unique username
+bool isEmpUsernameUnique(const string &username, Employee emp[], int EmpSize)
+{
+    for (int i = 0; i < EmpSize; i++)
+    {
+        if (emp[i].username == username)
+        {
+            return false; // Username exists in employee dataset
+        }
+    }
+    return true; // Username is unique
+}
+bool isCusUsernameUnique(const string &username, Customer cus[], int CusSize)
+{
+    for (int i = 0; i < CusSize; i++)
+    {
+        if (cus[i].username == username)
+        {
+            return false; // Username exists
+        }
+    }
+    return true; // Username is unique
 }
 //<-------------------------------Functionalities functions & validations---------------------------------->
 // this chacks whether input from 0 to 9
@@ -1587,6 +1612,7 @@ int stringToInt(string str)
 // employee adding function
 void addEmployee(Employee emp[], int EmpSize, int &empCount)
 {
+    string username = "";
     system("cls");
     setTextColor(14);
     cout << " ===================================" << endl;
@@ -1602,7 +1628,16 @@ void addEmployee(Employee emp[], int EmpSize, int &empCount)
             if (!emp[i].isExist)
             {
                 cout << "Enter Username : ";
-                emp[i].username = validUsername();
+                username = validUsername();
+                while (!isEmpUsernameUnique(username, emp, EmpSize))
+                {
+                    setTextColor(12); // red
+                    cout << "Username already exists!!!\n";
+                    setTextColor(14);
+                    cout<<"Please enter a different username: ";
+                    username = validUsername();
+                }
+                emp[i].username = username;
                 cout << "Enter Password : ";
                 cin.ignore();
                 emp[i].pwd = validPwd();
@@ -2385,6 +2420,7 @@ void managePendingOrders(Mobile mob[], int MaxMobile, int &mobileCount, string u
 //----------------------------------------------Customer related functions------------------------------------------------>
 void addCustomer(Customer cus[], int CusSize, int &customerCount)
 {
+    string username = ""; //temp input
     system("cls");
     setTextColor(14);
     cout << " ===================================" << endl;
@@ -2400,7 +2436,16 @@ void addCustomer(Customer cus[], int CusSize, int &customerCount)
             if (!cus[i].isExist)
             {
                 cout << "Enter Username : ";
-                cus[i].username = validUsername();
+                username = validUsername();
+                while (!isCusUsernameUnique(username, cus, CusSize))
+                {
+                    setTextColor(12); // red
+                    cout << "Username already exists!!!\n";
+                    setTextColor(14);
+                    cout<<"Please enter a different username: ";
+                    username = validUsername();
+                }
+                cus[i].username = username;
                 cout << "Enter Password : ";
                 cus[i].pwd = validPwd();
                 cout << "Enter your name :";
@@ -2611,6 +2656,7 @@ void placeOrder(Mobile mob[], int MaxMobile, int &mobileCount, string username, 
     int itemId = 0, qty = 0; // these are temp variables
     bool isItemFound = false;
     int cusIndex = 0; // stores currenly logened customer index
+    bool alreadyPlaced = false;
     cusIndex = findCustomerIndex(username, pwd, cus, CusSize);
     cout << endl;
     setTextColor(14);
@@ -2640,6 +2686,22 @@ void placeOrder(Mobile mob[], int MaxMobile, int &mobileCount, string username, 
             itemId = validIntInput("Item Id", 0, 1000);
             cout << "\tEnter the quantity : ";
             qty = validIntInput("Quantity", 1, 500);
+            //check if already placed same order
+            for (int z = 0; z < MaxOrder; z++){
+                if (cust[cusIndex].orders[z].isExist){
+                    if(cust[cusIndex].orders[z].itemId = itemId){
+                        alreadyPlaced = true;
+                        setTextColor(12); // Red
+                        cout<<"You cannot place an order for the same product more than once!";
+                        cin.get();
+                        break;
+                    } 
+                }
+            }
+            if(alreadyPlaced){
+                break; //break this loop
+            }
+
             for (int k = 0; k < MaxMobile; k++)
             { /*search mobile for qty check all mobile details exist at k related to mobiles*/
                 if (mob[k].itemId == itemId)
