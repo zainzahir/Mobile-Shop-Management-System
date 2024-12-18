@@ -1,5 +1,6 @@
 #include <iostream>
 #include <windows.h>
+#include<stdio.h>
 #include <iomanip>
 #include <conio.h> //used to use _getch() in masked pass
 #include <fstream>
@@ -67,6 +68,13 @@ struct CustomerOrder
     int orderCount = 0;
 };
 
+struct DeliveredOrder
+{
+    string cusUsername = "nv"; // Customer's username
+    int itemId = 0;           
+    int qty = 0;     
+};
+
 //<-----------------------------------Interfaces--------------------------------------->
 // main interface of App
 void mainInterface(); // enables to select type of user
@@ -110,6 +118,7 @@ void invalidErrorMessage();   // invalid option error
 int getValidDigitInput();     // make sure input is 0 - 9 single digit
 string maskedInputPass();     // input masked password from user
 void setTextColor(int color); // changes the color of specific text
+void loadingBar();
 string validDate();           // date validator
 string validPhoneNo();
 string validName(int minLen, int maxLen, string errorMsg);
@@ -159,7 +168,7 @@ void lowStock(Mobile mob[], int MaxMobile, int &mobileCount);
 //<-----------------------customer order management---------------------------------------->
 void ShowPendingOrders(Mobile mob[], int MaxMobile, int &mobileCount, string username, string pwd, Customer cus[], int CusSize, CustomerOrder cust[]);
 
-void managePendingOrders(Mobile mob[], int MaxMobile, int &mobileCount, string username, string pwd, Customer cus[], int CusSize, CustomerOrder cust[], int &total_Cost, int &total_Revenue, int &total_Profit, int &mobSold);
+void managePendingOrders(Mobile mob[], int MaxMobile, int &mobileCount, string username, string pwd, Customer cus[], int CusSize, CustomerOrder cust[],DeliveredOrder order[], int &total_Cost, int &total_Revenue, int &total_Profit, int &mobSold);
 
 //<------------------Customer profiles-------------------------->
 void addCustomer(Customer cus[], int CusSize, int &customerCount);
@@ -230,7 +239,8 @@ int main()
     CustomerOrder cust[CusSize];
     int customerCount = 0; // counts no of customer added
     int customerChoice = -1;
-
+    //order history
+    DeliveredOrder order[150];
     //<------------------inventry attributes------------------>
     const int MaxMobile = 30; // max no. of items
     Mobile mob[MaxMobile];
@@ -252,6 +262,8 @@ int main()
 
     loadOrders(cus, CusSize, cust);
 
+    loadProfitReport(total_Cost, total_Revenue, total_Profit, mobSold);
+
     do
     {
         mainInterface();
@@ -262,8 +274,10 @@ int main()
         {
         case 1:
         { // after getting correct premeter it checks whether credentials are correct or not
-            if (ManagerLoginChecker(managerUsername, managerPWD))
+            if (ManagerLoginChecker(managerUsername, managerPWD)){
                 loggedInUserType = 1;
+                loadingBar();
+            }
             else
             {
                 managerLoginHeader();
@@ -279,8 +293,10 @@ int main()
         {
             employeeLoginHeader();
             // it checks credentials if correct return true and move next
-            if (EmployeeloginChecker(emp, EmpSize))
+            if (EmployeeloginChecker(emp, EmpSize)){
                 loggedInUserType = 2;
+                loadingBar();
+            }
             else
             {
                 managerLoginHeader();
@@ -323,6 +339,7 @@ int main()
                         if (username == cus[i].username && pwd == cus[i].pwd)
                         {
                             loggedInUserType = 3;
+                            loadingBar();
                             isUserFound = true;
                             cusPortalChoice = 0; // to break the loop so control goes to portal after successfully login
                             break;
@@ -507,7 +524,7 @@ int main()
                 }
                 case 4:
                 { // order management
-                    managePendingOrders(mob, MaxMobile, mobileCount, username, pwd, cus, CusSize, cust, total_Cost, total_Revenue, total_Profit, mobSold);
+                    managePendingOrders(mob, MaxMobile, mobileCount, username, pwd, cus, CusSize, cust,order, total_Cost, total_Revenue, total_Profit, mobSold);
                     break;
                 }
                 case 5:
@@ -613,7 +630,7 @@ int main()
                 }
                 case 3:
                 {
-                    managePendingOrders(mob, MaxMobile, mobileCount, username, pwd, cus, CusSize, cust, total_Cost, total_Revenue, total_Profit, mobSold);
+                    managePendingOrders(mob, MaxMobile, mobileCount, username, pwd, cus, CusSize, cust,order,total_Cost, total_Revenue, total_Profit, mobSold);
                     break;
                 }
                 case 4:
@@ -956,6 +973,24 @@ void setTextColor(int color)
 {
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     SetConsoleTextAttribute(hConsole, color);
+}
+
+//loading bar
+void loadingBar() {
+
+    setTextColor(3);
+    cout << "\n\n\n\t\t\tLoading....";
+    cout << "\n\t\t\t";
+    printf("\e[?25l");
+    for (int i = 1; i <= 25; i++) {
+        cout <<"▒";
+    }
+    setTextColor(2);
+    cout << "\r\t\t\t";
+    for (int i = 1; i <= 25; i++) {
+        cout <<"█";
+        Sleep(50);
+    }
 }
 // use to input masked password
 string maskedInputPass()
@@ -2235,7 +2270,7 @@ void ShowPendingOrders(Mobile mob[], int MaxMobile, int &mobileCount, string use
     }
 }
 
-void managePendingOrders(Mobile mob[], int MaxMobile, int &mobileCount, string username, string pwd, Customer cus[], int CusSize, CustomerOrder cust[], int &total_Cost, int &total_Revenue, int &total_Profit, int &mobSold)
+void managePendingOrders(Mobile mob[], int MaxMobile, int &mobileCount, string username, string pwd, Customer cus[], int CusSize, CustomerOrder cust[],DeliveredOrder order[], int &total_Cost, int &total_Revenue, int &total_Profit, int &mobSold)
 {
     int choice;
     int stChoice;
@@ -2365,6 +2400,14 @@ void managePendingOrders(Mobile mob[], int MaxMobile, int &mobileCount, string u
                                 else if (stChoice == 2 && cust[cusIndex].orders[cusField].status == "Shipped")
                                 {
                                     // Update status to Delivered without modifying inventory
+                                    for(int i=0; i<150; i++){
+                                    if(order[i].cusUsername=="nv"){
+                                        order[i].cusUsername = cus[cusIndex].username;
+                                        order[i].itemId = itemId;
+                                        order[i].qty = cust[cusIndex].orders[cusField].qty;
+                                        break;
+                                    }
+                                    }
                                     cust[cusIndex].orders[cusField].status = "Delivered";
                                     setTextColor(10); // Green
                                     saveOrders(cus, CusSize, cust);
