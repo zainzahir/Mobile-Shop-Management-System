@@ -1,0 +1,6 @@
+zain,123,Zain,03458090100,05-11-2012,male,Gojra
+Zeshan,123,zain,03458090100,05-11-2006,male,gojra
+sara,sara789,Sara Khan,03204560789,15-08-2004,female,Lahore
+ahmed,ahmed101,Ahmed Raza,03124070822,12-03-2001,male,Karachi
+noor,123,noor,03450102030,01-03-2005,female,pir mahal
+fatima,123,Fatima,03459010800,01-02-2005,female,lahore

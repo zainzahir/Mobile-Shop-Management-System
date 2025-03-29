@@ -1,0 +1,9 @@
+oppo,oppo f21 pro,128 gb,4300 mah battery,orange,zahir,-1,98000,101000,5,1
+Samsung,Galaxy S21,128 GB,4000 mAh battery,Black,Samsung Corp,47,70000,75000,10,2
+Apple,iPhone 13,256 GB,3100 mAh battery,Blue,Apple Inc,0,120000,130000,15,3
+OPPO,OPPO A96,256 GB,5000 mah battery,black,Zahir,7,38000,42000,3,4
+Xiaomi,Redmi Note 10,64 GB,5020 mAh battery,White,Xiaomi Corp,40,15000,18000,12,6
+VIVO,Vivo Y100,256 GB,Dual speaker,white,Zaid,9,52000,55000,4,6
+Iphone,Iphone 8 plus,128 GB,waterproof,black,zaid,0,152000,160000,2,7
+iphone,iphone 11 pro,128 GB,good camera,black,iphone com,10,158000,165000,4,8
+oppo,fdjkafhjkda4235423,1 GB,dafgad,blue,zahir,34,1212,12121,2,9
